@@ -1,0 +1,32 @@
+This package constitutes an interactive R problem set based on the RTutor package (https://github.com/skranz/RTutor). 
+
+This problem set is based on the paper "The Colonial Origins of Comparative Development: An Empirical Investigation" by Daron Acemoglu, Simon Johnson, and Jamea A. Robinson (2001) that can be downloaded at https://www.aeaweb.org/articles?id=10.1257/aer.91.5.1369. 
+
+In the problem set we delve deeper into the theory that institutions and property rights can be the fundamental cause of the large differences in income per capita across countries, and use the European settler mortality estimate as an instrumental variable of institutional development in former colonies.
+
+The main purpose of the problem set is to provide the reader with an opportunity to recreate the approach of the authors step-by-step in the R environment in an interactive way. Since the original paper was written and published more than 20 years ago, an analysis with the modern data was additionally performed and added as a separate block in the problem set.
+
+## 1. Installation
+
+RTutor and this package is hosted on Github. To install everything, run the following code in your R console.
+```s
+install.packages("RTutor",repos = c("https://skranz-repo.github.io/drat/",getOption("repos")))
+
+if (!require(devtools))
+  install.packages("devtools")
+
+devtools::install_github("T_Nazar/RTutorInstitutionsAndEconomies")
+```
+
+## 2. Show and work on the problem set
+To start the problem set first create a working directory in which files like the data sets and your solution will be stored. Then adapt and run the following code.
+```s
+library(RTutorInstitutionsAndEconomies)
+
+# Adapt your working directory to an existing folder
+setwd("C:/problemsets/RTutorInstitutionsAndEconomies")
+# Adapt your user name
+run.ps(user.name="Jon Doe", package="RTutorInstitutionsAndEconomies",
+       auto.save.code=TRUE, clear.user=FALSE)
+```
+If everything works fine, a browser window should open, in which you can start exploring the problem set.

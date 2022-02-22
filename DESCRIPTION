@@ -1,0 +1,12 @@
+Package: RTutorInstitutionsAndEconomies
+Type: Package
+Title: RTutor problem set Institutions_And_Economic_Performance
+Version: 0.1
+Date: 2022-22-02
+Author: Nazar Tukhbatullin
+Maintainer: Nazar Tukhbatullin <nazar.tukh@gmail.com>
+Description: RTutor problem set Institutions_And_Economic_Performance
+License: Not yet licensed by the author. The default suggestion for licensing is
+	Problem set content: Creative Commons (CC BY-SA)
+	Package code: GPL >= 2.0
+Depends: RTutor, ggplot2, foreign, dplyr, stargazer, regtools, tidyverse, ggdag, dagitty, skimr, ggpubr, gridExtra, ivreg, modelsummary, yarrr, plotly

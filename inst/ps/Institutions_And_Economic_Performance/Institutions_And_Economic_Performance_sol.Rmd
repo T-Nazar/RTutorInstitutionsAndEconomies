@@ -1,0 +1,2751 @@
+#< ignore
+
+```{r setup}
+library(RTutor)
+# Adapt the working directory below and then run setup chunk in RStudio.
+setwd("/Users/nazar/Desktop/Rtutor_PS")
+ps.name = "Institutions_And_Economic_Performance"; sol.file = paste0(ps.name,"_sol.Rmd")
+libs = c("ggplot2", "foreign", "dplyr", "stargazer", "regtools", "tidyverse", "ggdag", "dagitty", "skimr", "ggpubr", "gridExtra", "ivreg", "modelsummary", "yarrr", "plotly") # character vector of all packages you load in the problem set
+
+#install.packages(libs)
+
+#name.rmd.chunks(sol.file)
+
+create.ps(sol.file=sol.file, ps.name=ps.name, libs=libs, addons = "quiz")
+        
+# The following line directly shows the problem set in the browser
+show.ps(ps.name,launch.browser=TRUE,
+  auto.save.code=FALSE,sample.solution=FALSE)
+
+```
+#>
+
+## Exercise 1: Introduction
+
+### Welcome!
+
+I am happy to welcome you in this problem set elaborating on how the quality of institutions defined the current economic performance of many countries. This problem set is a part of my master thesis at the Ulm University and I tried to make it interesting, useful for learning econometric concepts and R at the same time. I hope you will enjoy the time spent going through the exercises and have fun!
+
+### Content 
+
+I bet that almost every person has asked herself a question that can be generally formulated as “Why some countries are rich whereas others are poor?”. Surely there were some debates with friends, family or even yourself, and surely there was hardly any certain answer that could convince everybody. This is quite normal as there is still little consensus on the answer to this question even among scientists and researchers, although there are some hypotheses, one of which we are going to touch in this problem set.
+
+The paper *The Colonial Origins of Comparative Development: An Empirical Investigation* by Daron Acemoglu, Simon Johnson, and Jamea A. Robinson (2001) that can be downloaded <a href="https://www.aeaweb.org/articles?id=10.1257/aer.91.5.1369" target="_blank">here</a> delves deeper into the theory that institutions and property rights can be the fundamental cause of the large differences in income per capita across countries. The logic behind this hypothesis is that countries with better institutions, more secure property rights, and less distortionary policies will invest more in physical and human capital, and will use these factors more efficiently to achieve a greater level of income. Authors are analyzing variation in institutions in former European colonies and are accounting for different colonization strategies, the feasibility of settlements, and the persistence of established institutions. Of course, not everything is straightforward here, and there is enough space for two-way causation, endogeneity, and interpretation issues, and we will certainly touch on all these matters later. 
+
+### Problem set 
+
+The problem set is designed to lead you through the above-mentioned paper replicating the authors’ results in R. We will use some statistical and econometric methods and explore deeper the concept of instrumental variables estimation. You do not need to solve the exercises in the given order but it is recommended to do so as it makes more sense to start with descriptive statistics and go on with inference, causality, robustness checks, and to end with the conclusion. Moreover, later exercises expect earlier received knowledge from you. Within one tab you need to solve the tasks in the given order apart from the ones that are excluded explicitly with a note.
+
+At every code chunk you will find some buttons:
+- *edit*: click here to start entering your code. Once you have started to enter your code, you have new buttons to take use of. 
+- *check*: press it to check your solution and run the code
+- *run chunk*: press it to run the chunk and see the result directly in the chunk
+- *data*: press it to show the data that is currently available for analysis and manipulations. It will open in a separate tab
+- *hint*: press to to get a hint how to solve the task. This will help you in case something is unclear
+- *solution*: press it to show the code you should receive as a result. I do not recommend using this option too often, as our goal is to get through all the tasks by solving them. However, you can always take advantage of it if you are stuck.
+
+The problem set has the following structure:
+
+**Exercise 1: Introduction**
+
+**Exercise 2.1: Data overview**
+
+**Exercise 2.2: Plotting the data**
+
+**Exercise 2.3: Descriptive analysis & bivariate relations**
+
+**Exercise 3.1: OLS regression**
+
+**Exercise 3.2: Bias, endogeneity & control variables**
+
+**Exercise 4.1: Instruments against endogeneity**
+
+**Exercise 4.2: Choice of the plausible instrument**
+
+**Exercise 4.3: IV regression**
+
+**Exercise 4.4: Effects of diseases, overidentification tests & criticism**
+
+**Exercise 5.1: 20 years later - introduction**
+
+**Exercise 5.2: 20 years later - regressions**
+
+**Exercise 6: Conclusion**
+
+**Exercise 7 (optional): Data preparation**
+
+**Exercise 8: References**
+
+## Exercise 2.1: Data overview
+
+### Importing the data
+
+The first step of every analysis carried out in R or any other software environment is to load the necessary data. In our case, we will replicate a major part of the paper and we will use the data provided by the authors. All data is loaded from <a href="https://economics.mit.edu/faculty/acemoglu/data/ajr2001" target="_blank">here</a>, and the authors divided the dataset into 8 different data frames containing information to be used to get 8 respective tables that can be seen in the paper. In this exercise, we will load all data and prepare one dataset in a convenient form suitable for the most of following tasks and exercises.
+
+Although many problem sets have pre-processed datasets, I have decided to intentionally leave this stage of data preparation in the exercise as this is a very important part of any research which often requires substantial time and effort, especially if the data is not readily available. Our case is still simplified, however, it gives a glimpse of this process.
+
+We are going to import macroeconomic, geographic, and statistical data on 163 countries mostly from the period of 1980-1995, but some variables will even contain information from the year 1900.
+
+*Note: : if you would like to first get additional details on how to prepare and clean data, please go to the optional **Exercise 7**.*
+
+Now let's start with the first exercise.
+
+We are going to import the necessary data here. Importing data into R can be done by simply assigning the imported data to a variable that we create by giving it a name. Generally, we write something like `new variable = read.table("data_name")` or `new variable = readRDS("data_name.rds")`.
+
+In this task you should simply insert a name of the file `data.RDS`. Use the command `readRDS()` with `data.RDS` as an argument in quotes and assign it to the variable `data`.
+
+```{r "Task 2.1"}
+#< task
+# Use the command `readRDS()` with `data.RDS` as an argument in quotes and assign it to the variable `data`. Enter your code in the line below:
+
+#>
+data = readRDS("data.RDS")
+#< hint
+display("In order to save the data for future use, you should create this object in R. You therefore write: data = ... Then you have to give R the command what to save under this name - you add command readRDS(). In the brackets you write the data you want to load. It is also important to put quotes, otherwise R will think that you put another command in brackets. Then click check.")
+#>
+
+```
+
+#< award "First step on the moon!"
+Great! You successfully solved the first exercise and correctly imported the data! Importing data is the first step on our way to analyze it.
+
+There will be some awards to win in this problem set. You can easily look at them by typing `awards()` in the code box and clicking *run chunk*. 
+#>
+
+
+### First look at the data
+
+Now let's have a look at what the authors provide in this table. Use the command `head()` with loaded table name as an argument to reveal the first few rows of the dataset.
+
+```{r "Task 2.2",optional=TRUE}
+#< task
+#Let's have a look at the data with the head() command. Enter your code here:
+
+#>
+head(data)
+```
+
+We have quite a lot of variables (25, to be precise), but many of them will be required only in the last exercises of this problem set.
+
+As discussed earlier, we have some macroeconomic, geographic, and statistical data for different countries, and the two most important variables for our analysis will be `exprop` and `log_gdp_95`.
+
+`exprop` measures the risk of expropriation of private foreign investment by the government with a scale from 0 to 10, where a higher score means less risk. Mean value for the scores in all years from 1985 to 1995 is reported.
+
+ - `exprop` variable serves as a proxy for the quality of institutions and property rights. That being said, in response to expropriatory threats of one kind or another, entrepreneurs not only reduce investment, they also invest in less specialized capital (human and physical), which can be moved more easily from one activity to another. This has static efficiency effects but also discourages dynamic gains from innovation since innovation is most likely to thrive when specialization is encouraged.
+
+#< info "How risk of expropriation was calculated in the original paper?"
+
+This variable comes as a part of a data set from the International Country Risk Guide (ICRG) published by Political Risk Services (PRS). The ICRG staff collects political information and financial and economic data, converting these into risk points for each individual risk component on the basis of a consistent pattern of evaluation. The political risk assessments are made on the basis of subjective analysis of the available information, while the financial and economic risk assessments are made solely on the basis of objective data.
+
+This variable evaluates the risk of “outright confiscation and forced nationalization” of property. Lower ratings “are given to countries where expropriation of private foreign investment is a likely event.”
+
+#>
+
+- `log_gdp_95` is a logarithm of Gross Domestic Product per capita in the year 1995, Purchasing Power Parity basis. This variable serves as an indication of economic performance and will be our main dependent variable in the further analysis.
+
+**Since the paper was written 20 years ago, it would make sense not only to replicate the paper but also to check if the original conclusions hold when we use modern data. In order to do this, we will also include a new measure of expropriation risk and log GDP per capita in our dataset.**
+
+**We will analyze the differences between the original paper and modern estimates in the section “Do the results hold 20 years later?”. More details on the modern variables and approach can also be found in that section.**
+
+Here are some of the other important variables used in the replication exercise:
+
+- `country`: ISO code of the country
+
+- `base`: Dummy variable, which is equal to 1 if the country is included in the base sample, and 0 otherwise. Later on, the base sample will be predominantly used to carry out the analysis. The base sample was constructed by the authors with respect to the availability of data for countries and some other criteria that we will cover later.
+
+- `log_mort`: Logarithm of estimated settler mortality during the colonization period. It is measured in terms of deaths per annum per 1,000 “mean strength” (raw mortality numbers are adjusted to what they would be if a force of 1,000 living people were kept in place for a whole year, e.g., this number can exceed 1,000 in episodes of extreme mortality as those who die are replaced with new arrivals).
+
+- `latit`: Absolute value of the latitude of the country, scaled to take values between 0 and 1, where 0 is the equator. Latitude is the measurement of distance north or south of the Equator. It is measured with imaginary lines going parallel to the Equator.
+
+- `africa`, `asia`, `other`: Dummy variables for the continents, where the country is located. Since it is clearly not the most visual way to present data, we have one column with names of continents for each country that we will use for descriptive analysis. Nevertheless in regression analysis later we will get back to the original dummies.
+
+A more detailed description of other variables is given in the info block below. It could be useful to quickly skim the definitions, but there is no need to do it right now. You can always come back later and go through each definition in detail when we will use these variables in the further analysis.
+
+#< info "Other variables in the table"
+
+- `eur_1900`: Percent of population that was European or of European descent in 1900
+
+- `ex_colony`: Dummy variable, 1 if the country is a former colony, 0 otherwise
+
+- `cons_1st`, `cons_1900`, `cons_1990`: Constraint on Executive in the first year of independence, 1900 and 1990 respectively. A seven-category scale, from 1 to 7, with a higher score indicating more constraints. A score of 1 indicates unlimited authority; a score of 3 indicates slight to moderate limitations; a score of 5 indicates substantial limitations; a score of 7 indicates executive parity or subordination. Scores of 2, 4, and 6 indicate intermediate values. Set equal to 1 if the country was not independent on that date.
+
+- `democ_1900`: Democracy in 1900. An eleven-category scale, from 0 to 10, with a higher score indicating more democracy. Points are awarded on three dimensions: Competitiveness of Political Participation (from 1 to 3); Competitiveness of Executive Recruitment (from 1 to 2, with a bonus of 1 point if there is an election); and Constraints on Chief Executive (from 1 to 4). Set equal to 1 if the country was not independent at that date
+
+- `mort`: Estimated potential settler mortality during the colonization period.
+
+- `mal_94`: Malaria in 1994 is the percent of people living in an area where this disease is endemic;
+
+- `yell_fev`: Dummy equal to 1 if yellow fever epidemics before 1900 and 0 otherwise. Oldstone (1998 p. 69) shows the current habitat of the mosquito vector; these countries are coded equal to 1. In addition, countries in which there were epidemics in the nineteenth century, according to Curtin (1989, 1998) are also coded equal to 1;
+
+- `inf_mort_95`: Infant mortality rate (deaths per 1,000 live births). From McArthur and Sachs (2001).
+
+- `life_exp_95`: Life expectancy at birth in 1995. From McArthur and Sachs (2001).
+
+- `meantemp`: 1987 mean annual temperature in degrees Celsius. From McArthur and Sachs (2001).
+
+#>
+
+One of the most well-known commands for showing basic descriptive statistics is `summary()`. However, the output might appear not in the most convenient for further analysis form, especially if there are many variables in the dataset. This is because `summary()` yields an individual column for each variable.
+
+The good news is that there are already some packages that make more visualized and clear summaries, like `stargazer` or `skimr`. We will use the `stargazer` package later to analyze the results of regressions, but now let's have a look at the command `skim` from the package `skimr`.
+
+In this task you should first use the command `library()` to access the package `skimr`. You simply have to put the name of the package in brackets of the command without any quotes or special characters.
+
+```{r "Task 2.9"}
+#< fill_in
+#First of all, load the necessary package `skimr`:
+library(___)
+
+#Now use the function `skim()` with our data as an argument. Enter the code below:
+
+#>
+library(skimr)
+skim(data)
+```
+
+Great! Now we have a much nicer format. And it's time for some quizzes.
+
+#< quiz "Counting countries"
+question: How many countries do we have in a dataset?
+sc:
+    - 30
+    - 163*
+    - 99
+    - 29
+success: Correct, the number of rows equals to the number of countries.
+failure: Try again.
+
+#>
+
+#< quiz "Counting countries 2"
+question: What percentage of the total dataset is our base sample?
+sc:
+    - 39%*
+    - 49%
+    - 64%
+    - Impossible to calculate
+success: Correct, if we look at the `base` variable, we will see that it is a dummy variable containing 0's and 1's, so mean statistic shows the percentage of 1's.
+failure: Try again. Pay attention to the variable `base` and information about the variable in the table.
+
+#>
+
+#< info "Mathematics in R"
+Here are some examples for mathematical operations in R
+```{r "info 1"}
+# Addition
+1 + 2
+# Subtraction
+3 - 1
+# Multiplication
+4 * 6
+# Division
+15 / 3
+# Raising to the power of 3
+6 ^ 3
+# Extracting a root
+sqrt(9)
+# Taking exponential function
+exp(6)
+# Taking logarithm
+log(6)
+
+```
+#>
+
+In order to solve the next quiz, you will probably need the space to operate with code. You can use the blank chunk below for calculations, if necessary.
+
+```{r "Task 2.10", optional = TRUE}
+#< task_notest
+
+#>
+```
+
+#< quiz "Trap 1"
+question: What is the average GPD per capita in 1995 in the dataset?
+sc:
+    - 0.908
+    - 4023.9*
+    - 8.3
+    - 8300.0
+success: Correct, you are attentive to details. We should take exponent of logarithm of X in order to get the original X. In our case we should simply calculate exp(8.3) = 4023.9
+failure: Probably you should check the question once again.
+
+#>
+
+## Exercise 2.2: Plotting the data
+ 
+### Plotting the data - GDP
+
+Ok, enough work with numbers for now. You probably noticed small histograms in the very right column. They show the frequency distribution of data points for each variable, which could be useful to get a quick understanding, but it is still not very informative.
+
+Let’s plot some histograms on a bigger scale. One of the nice ways for plotting the data is to use the package `ggplot2`. In the task below we will first plot the histogram step by step in order to introduce the mechanics of the code in detail, later on, all operations will be performed in one code chunk.
+
+a) First, we need load the `ggplot2` package. Then we should create a background, i.e. tell the function where to take data points from and what axes to construct. For this, we use the command `ggplot()`. Use it to assign the background to the variable `histogram_1`. We want to use `data` as a first argument and `aes(x = ..., y = ...)` as a second one to name the variables which we want to plot on X and Y axes. In our case we want to have a histogram-type of the chart in the end, therefore we only specify the x-axis and do not need to state the y-axis explicitly (i.e. we omit it in the code).
+
+```{r "Task 2.11.1"}
+#< fill_in
+
+#First we load the package and the data
+data = readRDS("data.RDS")
+library(ggplot2)
+
+#Assign the background to the variable histogram_1a. We want to plot the variable `log_gdp_95` on the x-axis.
+histogram_1a = ggplot(data, aes(x = ___))
+
+#Now call `histogram_1a` to see the background that we created.
+histogram_1a
+#>
+data = readRDS("data.RDS")
+library(ggplot2)
+histogram_1a = ggplot(data, aes(x = log_gdp_95))
+histogram_1a
+#< hint
+display("To assign the background to histogram_1 write histogram_1 = ... The basic construction for a ggplot background is ggplot(data frame, aes(x = ..., y = ...)). In our case of building a histogram we only need x variable as an argument of aes().")
+#>
+```
+
+Fine, we can see that the background is ready.
+
+b) Now we can add functions to the background by using the "+" sign. We are going to add a histogram itself to the background with the command `geom_histogram()` specifying the desired inner colour with `fill="orange"`, the border colour with `color="black"` and the width of histogram bins with `binwidth = 0.5`. The command `binwidth = ...` helps to get a better picture of the data and how it is distributed by adjusting the width of each category bar. It is important to choose a good value to have a balance between granularity and generality.
+
+```{r "Task 2.11.2"}
+#< fill_in
+#Add histogram to the variable histogram_2 and reassign the whole plot to the variable histogram_2. Specify orange fill and black border colour. Use binwidth=0.5 in order to have a more general picture.
+
+histogram_1ab = histogram_1a + geom_histogram(fill="___", colour="___", binwidth=___)
+histogram_1ab
+#>
+histogram_1ab = histogram_1a + geom_histogram(fill="orange", colour="black", binwidth = 0.5)
+histogram_1ab
+```
+
+Perfect, we can already see the distribution of the data. But let us finish wuth the formatting before analyzing the histogram.
+
+c) Now with the command `geom_vline()` we add red vertical line indicating the mean of the variable `log_gdp_95` (with omitted NAs) and with the command `linetype = "dashed"` change the line type to dashed to see it better. We again reassign the sum of previous `histogram_1` and new element to `histogram_1`.
+
+```{r "Task 2.11.3"}
+#< fill_in
+# 2.) Add the vertical line showing the mean of `log_gdp_95` with omitted NAs and reassign the whole plot to the variable histogram_1. Specify size = 1, red colour and dashed linetype.
+histogram_1abc = histogram_1ab + geom_vline(xintercept=___(data$log_gdp_95, na.rm=TRUE), size = 1, colour = "red", linetype = "___")
+histogram_1abc
+#>
+histogram_1abc = histogram_1ab + geom_vline(xintercept=mean(data$log_gdp_95, na.rm=TRUE), size = 1, colour = "red", linetype = "dashed")
+histogram_1abc
+#< hint
+display("Remember that we want to show the average of the log_gdp_on the histogram, therefore we want to use `mean` command in the first fill-in space. In the second one you can simply type `dashed` in quotes, this should work.")
+#>
+```
+
+d) Last but not least we are going to add the text on the title, x- and y-axes of the graph by adding `+ labs(title="...", x = "...", y = "...")` and format text elements to be in a center of the chart. The title is "Log GDP Distribution in 1995", the x-axis name is "Log PPP GDP 1995", the y-axis name is "Count". We can also center the title with the command `theme(plot.title = element_text(hjust = 0.5)`, where `0.5` states the position of the title.
+
+Then we again reassign the sum of `histogram_1` and new element to `histogram_1`.
+
+```{r "Task 2.11.4",fig.height=7, fig.width=8}
+#< fill_in
+# 3.) Replace all ___ to add a title and axes names, then reassign everything to `histogram_2`. Set title to "Log GDP Distribution in 1995", x-axis name to "Log PPP GDP 1995", y-axis name to "Count".
+histogram_1 = histogram_1abc + ___(title="___", x="___", y = "___") + theme(plot.title = element_text(hjust = 0.5))
+histogram_1
+#>
+histogram_1 = histogram_1abc + labs(title="Log GDP Distribution in 1995", x="Log PPP GDP 1995", y = "Count") + theme(plot.title = element_text(hjust = 0.5))
+histogram_1
+```
+
+Now let's have a look at the chart. 
+
+#< quiz "Its a trap 2"
+question: What could one say about the distribution of PPP GDG per capita based on the histogram we see above?
+sc:
+    - The sample is adequately balanced with most countries having average income and only a few countries having low and high GDP levels.
+    - There is a big cluster of countries with low income, a smaller group of countries having higher than average income and a few countries having extremely high income.*
+success: CCorrect, you paid attention to the fact that we have a logarithm on the x-axis, which means that the actual GDP figures (can be calculated as exp(log_gdp_95)) should show that most countries in 1995 had lower-end income with a fewer countries having significantly higher income (long right tale).
+failure: Pay attention to the logarithm on the x-axis.
+
+#>
+
+An important feature in the depicted distribution is that we can see a “jump” around Log GDP of 10, which corresponds to approx. USD 22,000 GDP per capita in 1995. This likely reflects the group of developed countries with similar and higher GDP figures. Let us also plot the original GDP figures to investigate this issue further.
+
+In order to be able to compare the histograms directly, we will plot them next to each other. For this, we will use the package `gridExtra`, which allows to specify the layout of several charts and plot them all at once.
+
+```{r "Task 2.12",fig.height=7, fig.width=8}
+#< task
+# Load the package 
+library(gridExtra)
+
+histogram_1_adj = histogram_1 + ylim(0, 45)
+histogram_1_exp = ggplot(data, aes(x = exp(log_gdp_95))) + geom_histogram(fill="orange", colour="black", binwidth = 2000) + geom_vline(xintercept=mean(exp(data$log_gdp_95), na.rm=TRUE), size = 1, colour = "red", linetype = "dashed") + labs(title="GDP Distribution in 1995", x="PPP GDP 1995", y = "Count") + theme(plot.title = element_text(hjust = 0.5)) + ylim(0, 45)
+
+#In the `grid.arrange()` command we simply list all necessary histograms and specify the number of rows or columns.
+grid.arrange(histogram_1_adj, histogram_1_exp, ncol=2)
+
+#>
+```
+
+Great, now we can see that our hypothesis is confirmed - we can see that most countries have GDP of around 3,000 - 5,000 USD, and that there is a clear group of countries with GDP figures around 18,000 - 25,000 USD, reflecting developed ones.
+
+#< award "Big picture is built on details"
+Well done! We should always carefully analyze the charts and try to explain the patterns in a logical way, as numbers do not always speak for themselves. Only in this case we would be able to get the most comprehensive understanding of the task and required approach.
+#>
+
+
+### Plotting the data - Quality of institutions
+
+Now let us have a look at the quality of institutions. Just follow the instructions and build a new histogram analogously to that one above by filling the necessary information in the gaps.
+
+```{r "Task 2.13"}
+#< fill_in
+
+#Create the histogram with the original protection against expropriation risk (variable `exprop`) on the x-axis and add a vertical line showing the average `exprop` value:
+
+histogram_3 = ggplot(data, aes(x = ___)) + ___(fill="darkmagenta", colour="black", binwidth=0.5) + ___(xintercept=mean(data$exprop, na.rm=TRUE), size = 1, colour = "red", linetype = "dashed") + labs(title="Protection against expropriation risk 1985-1995",x="Protection against expropriation risk", y = "Count") + theme(plot.title = element_text(hjust = 0.5))
+
+#Now plot the histogram
+histogram_3
+
+#>
+histogram_3 = ggplot(data, aes(x = exprop)) + geom_histogram(fill="darkmagenta", colour="black", binwidth=0.5) + geom_vline(xintercept=mean(data$exprop, na.rm=TRUE), size = 1, colour = "red", linetype = "dashed") + labs(title="Protection against expropriation risk 1985-1995",x="Protection against expropriation risk", y = "Count") + theme(plot.title = element_text(hjust = 0.5))
+
+histogram_3
+
+```
+
+#< award "Master of histograms"
+Well done! You are now familiar with building a detailed histogram as well as with some elements of the ggplot2 package. We often need to do this in the first step to better understand the variables and to find interesting facts about the data. But do not forget that charts can sometimes be quite misleading so always be careful and do not make conclusions only on the basis of what you see on the chart. Later we will see one such example.
+#>
+
+On the chart we can clearly see that there are 2 peaks at around average and maximum scores, reflecting groups of developing and developed countries, with a lower number of countries that received extremely low or above-average ratings.
+
+Overall, the graphical illustration of the variable suggests that the distribution of the quality of institutions is skewed to the right and that there are more countries that tend to have higher quality institutions with more property rights. This is quite normal due to the fact that “grades” for expropriation risk were assigned by people.
+
+
+## Exercise 2.3: Descriptive analysis & bivariate relations
+
+### Deep-dive into GDP differences: looking at different areas
+
+While further exploring the data, we can perform a sanity check. Let's make an educated guess first.
+
+#< quiz "Common sense"
+question: According to common knowledge, which continent has the lowest average/median GDP?
+sc:
+    - Africa*
+    - Asia
+    - South America
+    - Europe
+success: Correct. 
+failure: Try again.
+
+#>
+
+Let’s check this by extracting the median and average GDP values across countries in each continent.
+
+#< info "Median vs. average values"
+
+We would like to get a general idea about the GDP values on different continents and reveal the most typical values. In many cases mean fully suffices these requirements, but there are special cases when median suits better.
+
+One such situation is when data contains outliers - unusual values compared to the rest of the data set by being especially small or large in numerical value. The mean is vulnerable to the outliers as even one large number can considerably skew it. Median shows the middle value and does not make any difference whether the largest value is $1\%$ or $1000\%$ higher than the second largest one.
+
+The second case is when the data is skewed (i.e., the frequency distribution for our data is skewed). With the normal distribution, the mean and median are identical, and they all represent the most typical value in the data set. However, the more skewed the data becomes, the less representative the mean is in its ability to provide the best central location for the data. This happens because the skewed data is dragging it away from the typical value. The median is not as strongly influenced by the skewed values and better retains this position.
+
+As we have already seen, our data includes actual GDPs of different countries, and the distribution is certainly not normal. Moreover, we have outliers in the data, which will only further skew the statistic if we show the average GDP values by continent. This is why the median is a preferred statistic in our case.
+
+#>
+
+In order to show median and average across countries in each continent, we will use `group_by` and `summarise` commands as well as the pipe operator `%>%` from the `dplyr` package. If you are already familiar with them, feel free to start with the code chunk, otherwise it could be helpful to read the info block below:
+
+#< info "Commands `group_by()`, `summarise()` and `%>%`"
+
+`group_by()`, `summarise()` and a pipe operator `%>%` are a part of the `dplyr` package. 
+If you would like to know more about this package, click: <a href="https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html" target = "_blank"> here</a>. 
+
+Combining these commands is a very nice way to compute values for different groups in our data set. 
+
+- `group_by()` takes the raw data and groups it. The grouping should be done by categorical variables and can be done by multiple variables. All following operations on the data will be done on the grouped data.
+- `summarise()` runs the computation you want to execute for every group created by the `group_by()` command. In addition it prints out the groups.
+
+Finally, pipe operator `%>%` will forward a value, or the result of an expression, into the next function call/expression. In the most simple case it can be used as following:
+
+  `summary(data)` OR `data %>% summary()`
+
+One of the easiest ways to remember the principle how pipe operator works is to read the `%>%` as `and then`. In our example with summary it would sound like `Take data AND THEN show summary of it`. The advantage of the pipe operator becomes clear when you need to perform multiple functions on the same data. Later we will use it in other tasks as well and you will get more familiar with it.
+
+#>
+
+```{r "Task 2.17"}
+#< fill_in
+#As usual, first we need the respective package to make use of its commands.
+data = readRDS("data.RDS")
+library(dplyr)
+
+#Now we want to use group_by() and summarize() commands. Your task is to group the data properly to confirm our guess in the quiz above, so replace the first ___ in the group_by() command with a correct variable. You should also add correct variables in the second and third spaces to make R calculate medians and averages of the absolute GDP figures.
+
+data[!is.na(data$log_gdp_95),] %>% 
+  group_by(___) %>% 
+  summarise(Median_GDP_per_capita_95 = round(median(exp(___)), digits = 0), Average_GDP_per_capita_95 = round(mean(exp(___)), digits = 0))
+
+#>
+data = readRDS("data.RDS")
+library(dplyr)
+
+data[!is.na(data$log_gdp_95),] %>% 
+  group_by(continent) %>% 
+  summarise(Median_GDP_per_capita_95 = round(median(exp(log_gdp_95)), digits = 0), Average_GDP_per_capita_95 = round(mean(exp(log_gdp_95)), digits = 0))
+
+#< hint
+display("We would like to group the countries by continent, therefore you should simply add `continent` there.")
+#>
+```
+
+#< info "Is Oceania a continent?"
+Oceanic islands are frequently grouped with a neighboring continent to divide all the world’s land into regions. Under this scheme, most of the island countries and territories in the Pacific Ocean are grouped together with the continent of Australia to form a region called Oceania.
+#>
+
+As you can see, the variation between countries on different continents is quite significant. Median income per capita across countries in Africa is less than 1500 USD , whereas it is significantly exceeding 10 000 USD in countries in Europe and Oceania.
+
+Let us also visualize these differences, thus making it much easier to interpret them. We will use the pirateplot function.
+
+#< info "pirateplot"
+
+The pirateplot function is a part of the `yarrr` package. It is an easy-to-use function that, unlike barplots and boxplots, can easily show raw data, descriptive statistics, and inferential statistics in one plot.
+
+A pirateplot has 4 main elements
+- points: symbols representing the raw data
+- line: descriptive statistic, usually the mean or median
+- bean: a smoothed density curve showing the full data distribution.
+- band: a rectangle representing an inference interval around the mean, either a Bayesian Highest Density Interval (HDI), or a Confidence Interval (CI)
+
+The two main arguments to pirateplot() are "formula" and "data". 
+In the "formula", you specify plotting variables in the form y ~ x, where y is the name of the dependent variable, and x is the name of the independent variable. In the "data", you specify the name of the dataframe object where the variables are stored. 
+There are many different pirateplot themes, these themes dictate the overall look of the plot. To specify a theme, just use the "theme = x" argument, where x is the theme number from 1 to 4.
+
+There are also many other arguments that can be added to customize the plot. 
+
+If you would like to know more about this function and ways to customize it, click <a href="https://cran.r-project.org/web/packages/yarrr/vignettes/pirateplot.html" target = "_blank"> here</a>. 
+#>
+
+Now it's time to plot it:
+
+```{r "Task 2.18"}
+#< fill_in
+#First we load the necessary package
+library(yarrr)
+
+#We would like to show absolute GDP per capita figures on the y-axis and continents as a categorical variable on the x-axis:
+pirateplot(formula = exp(___) ~ ___,
+           data = data,
+           theme = 1,
+           pal = "basel",
+           main = "1995 GDP per capita by continents",
+           ylab = "GDP per capita 1995", 
+           xlab = "Continent")
+#>
+library(yarrr)
+
+pirateplot(formula = exp(log_gdp_95) ~ continent,
+           data = data,
+           theme = 1,
+           pal = "basel",
+           main = "1995 GDP per capita by continents",
+           ylab = "", 
+           xlab = "Continent")
+
+```
+
+Now let's have a deeper look at the results.
+
+-	We can see that countries in Europe and Oceania have the highest GDP per capita, which is not surprising. Moreover, in Europe, we can easily notice 2 groups of countries on the pirateplot chart, which reflect more economically developed Western European countries and less developed Eastern European ones.
+- Oceania contains only 3 countries with recorded GDP, and if we take the median, it will show GDP of the New Zealand, which is why it is so high.
+- As concerns countries in North America, the low average and median numbers might seem surprising at a first glance, but we should remember that although there are rich countries like Canada and the USA, all other countries are rather poor, which gives a low average and median values of countries’ GDP per capita. This can also be clearly seen on the pirateplot chart.
+
+Later on, we will try to understand the fundamental causes of such a huge difference.
+
+### Deep-dive into GDP differences: adding temperature
+
+At this point, it would also be interesting to dive a little bit deeper and add average temperature (measured in °C). As usual, we start with a little quiz.
+
+#< quiz "Common sense 2"
+question: Make a guess, what kind of relation could one see while examining average temperature, GDP and location of the country?
+sc:
+    - African countries have highest average temperature and lowest GDP*
+    - Asian countries have moderate average temperature and lowest GDP
+    - African countries have highest average temperature and moderate GDP
+    - No relation should be seen
+success: Correct, this makes sense. Empirical knowledge and intuition help to make such hypothesis. 
+failure: Try again.
+
+#>
+
+Now let’s check if our data confirms the hypothesis by plotting the necessary data.
+
+Here we also introduce a nice package that helps to build interactive charts - package “plotly”.
+
+#< info "plotly"
+
+The `plotly` R package serializes `ggplot2` figures into Plotly's universal graph JSON. `ggplotly()` function will crawl the `ggplot2` figure, extract and translate all of the attributes of the `ggplot2` figure into JSON (the colors, the axes, the chart type, etc), and draw the graph with plotly.js.
+
+There are two main ways to creating a plotly object: either by transforming a ggplot2 object (via ggplotly()) into a plotly object or by directly initializing a plotly object with `plot_ly()` / `plot_geo()` / `plot_mapbox()`.
+
+**We will simply use `ggplotly()` function to make some charts interactive.**
+
+If you would like to know more about this function and ways to customize it, click <a href="https://cran.r-project.org/web/packages/plotly/index.html" target = "_blank"> here</a> and <a href="https://plotly.com/r/" target = "_blank"> here</a>.
+
+#>
+
+Just run the code chunk below.
+
+```{r "Task 2.19", output = "htmlwidget", widget = "plotly"}
+#< task
+library(plotly)
+p = data %>%
+    ggplot(aes(x = log_gdp_95, y = meantemp, colour = continent)) + 
+    geom_text(label=data$country) +
+    scale_color_hue() + 
+    labs(x="Log PPP GDP", y = "Average temperature in °C")
+ggplotly(p)
+#>
+```
+
+You can hover the mouse over any data point to reveal additional information about the concrete observation. Additionally, you can click on each category on the legend to remove it from the chart (or double-click to show only this category).
+
+Fine, we can clearly see that African countries are mostly plotted in the top left corner with the highest average temperature and lowest GDP, whereas Asian and other countries are taking middle and middle-right positions of the chart.
+
+Note: the chart only shows countries for which authors have collected data and which were colonies in the past - this is our base sample. More details will be given in the section 2.4.
+
+
+### Relation of GDP and expropriation risk
+
+Alright, we have seen that the data meets the general requirements of adequacy, and let’s now get back to our main topic and check if we can find any dependencies between the quality of institutions and economic performance.
+
+First, let’s simply plot the variables that we are interested in at most  - `log_gdp_95` and `exprop`. Before we do this, it is important to mention at this point that all future analyses will be based not on the initial sample, rather on the base one. First, we need to detach the base sample from the whole, and this can be easily done with the help of the command `filter`. By default it requires two arguments, the original dataset and a rule/condition to filter the data, e.g. `filter(data, data$x == "5")`
+
+```{r "Task 2.20"}
+#< fill_in
+#Use the command `filter()` in order to get a base sample from the original dataset and save the new base data in the variable `data_base`. Second argument should define the value of a variable `base` to be equal to 1. It is important to use double equals sign `==` when you define a condition.
+data = readRDS("data.RDS")
+data_base = ___(data, data$___ == "___")
+#>
+data = readRDS("data.RDS")
+data_base = filter(data, data$base == "1")
+```
+
+Great, now we have a base sample to work with. It is limited to the 64 countries that were ex-colonies and for which we have settler mortality, protection against expropriation risk, and GDP data. If you want, you can call the command `summary()` or `skim()` in a chunk below to have a quick overview here. This is not a necessary task, as the data will have the same structure as our original dataset.
+
+```{r "Task 2.21", optional = TRUE}
+#< task_notest
+
+#>
+skim(data_base)
+```
+
+Well, now it’s time to actually plot the variables. First, let’s try to anticipate what we could see on this chart.
+
+#< quiz "Following trends"
+question: Would you expect to see any dependence or pattern on the chart at a first glance?
+sc:
+    - Yes, we expect to see a positive correlation between log GDP and protection against expropriation risk*
+    - Yes, we expect to see a negative correlation between log GDP and protection against expropriation risk
+    - No, there will likely be no obvious correlation
+    
+success: Correct, given our previous analysis, it is logical to assume that we should notice a positive correlation between log GDP and protection expropriation risk.
+failure: Try again, but pay attention to our previous analysis.
+
+#>
+
+Now let us check our assumption by plotting expropriation risk and GDP values across the base sample.
+
+```{r "Task 2.22", output = "htmlwidget", widget = "plotly"}
+#< fill_in
+#Replace ___ in order to construct a plot showing expropriation risk and gdp values across the base sample. Place expropriation risk on the x-axis, GDP on the y-axis, and colorize countries by continents.
+library(plotly)
+plot_1 = data_base %>%
+    ggplot(aes(x = ___, y = ___, colour = ___)) +
+    geom_text(label=data_base$country) + 
+    labs(x="Average protection against expropriation risk 1995", y = "Log PPP GDP 1995")
+
+#Here we use ggplotly() function to make the chart interactive:
+ggplotly(plot_1)
+
+#>
+library(plotly)
+plot_1 = data_base %>%
+    ggplot(aes(x = exprop, y = log_gdp_95, colour = continent)) +
+    geom_text(label=data_base$country) + 
+    labs(x="Average protection against expropriation risk 1995", y = "Log PPP GDP 1995")
+ggplotly(plot_1)
+```
+
+Perfect, now let’s look at what we have on the chart. Here we can see that countries with higher protection against expropriation risk have higher GDP, and we can confirm the anticipated positive correlation. On the left chart, which replicates the result from the paper, the correlation is stronger. On the one hand, this might be because of more precise data used by the authors. On the other hand, it could also be the case that the association is getting weaker with time. We will investigate this issue further in the next chapters.
+
+After we noticed the positive correlation on the chart, we certainly want to make it a bit more formal, namely, to display it on the chart. Luckily, `ggplot2` package allows us to do so.
+
+Before we go on, let us remember some theory. We can give R a command to add a linear measure of this correlation on the chart, and R will draw a straight line by minimizing the difference between the observed data points and closest points on this drawn line. It is important to mention that squares of each difference are taken in order to penalize high errors, and then the sum of squared errors is minimized. This method is called `Ordinary Least Squares`, or just `OLS`, and you will find more detailed information about it in the next chapter.
+
+Alright, let us give R a task to make this work for us and add a line on the chart. Note that we use the chart from the previous task without grouping the observations by continents and also modify the code by adding one more element.
+
+```{r "Task 2.23", output = "htmlwidget", widget = "plotly"}
+#< task
+
+plot_1_line = data_base %>%
+    ggplot(aes(x = exprop, y = log_gdp_95)) +
+    geom_text(label=data_base$country) + 
+    labs(x="Average protection against expropriation risk", y = "Log PPP GDP")+ 
+    geom_smooth(method='lm', se = FALSE)
+ggplotly(plot_1_line)
+
+#>
+
+```
+
+Perfect, now we can see that the linear model only confirms our thoughts - there is indeed a strong correlation between our measure of institutions and income per capita. The line on the chart captures this relation between the data points and has a positive slope.
+
+At this point, we will stop simply exploring the available data and blindly looking for all kinds of patterns. In the next exercise, we will learn more about why we are so specifically interested in institutions, delve deeper into the analysis of the relationship between variables with the help of the regressions.
+
+#< award "27% completed"
+Congratulations! You are making progress and have just completed ~27% of the problem set. Continue with the next exercise to get one step closer to the end of the problem set.
+#>
+
+
+## Exercise 3.1: OLS regression
+
+In this exercise, we will build a simple linear model, analyze the correlations between the variables in more detail and think about how we can interpret the results of the regression.
+
+**_________________________________________________________________________________________________________________________________**
+
+**Disclaimer:**
+
+For illustrative purposes, simplicity, and in order to avoid impreciseness of formulations, in the following exercises, we first assume that the linear OLS model can adequately capture the relationship between variables and there are no endogeneity problems impacting the causal relationship. The following exercises are presented in a way to gradually reveal potential obstacles/problems and find solutions, therefore getting to more complicated models step by step.
+
+**_________________________________________________________________________________________________________________________________**
+
+Let us first remember, why are we interested in institutions as a whole. There are many articles and papers that explore the impact of institutions on economic performance, and the general conclusion is that level of income is dependent on the amount of investment in physical and human capital, which is in turn strongly dependent on the security of property rights and development of institutions in that country (North, 1981, Jones, 1981).
+
+This view was also confirmed by cross-country correlations between measures of property rights and economic development (e.g., Knack and Keefer, 1995, Mauro, 1995, Hall and Jones, 1999, Rodrik, 1999), and by micro-studies that explore the relationship between property rights and investment or output (e.g., Besley, 1995, Mazingo, 1999, Johnson, McMillan and Woodruff, 1999).
+
+Authors of our article provide some empirical examples that almost everybody is aware of - they compare paths of North and South Korea, or East and West Germany, where differences in economic performance and development started to grow drastically shortly after they chose opposite paths - central planning and collective ownership versus market economy and private property.
+
+### Ordinary Least Squares (OLS)
+
+Let us remember the last chart from the previous exercise where we also saw quite an obvious correlation between institutions (proxied by expropriation risk) and now try to explore it deeper with the help of an OLS method, which we discussed earlier. This time, however, we will construct the regression ourselves and analyze the output.
+
+#< info "Assumptions of the OLS model"
+- A1. Linearity: $y_i = x_{i1}β_1 + x_{i2}β_2 +...+ x_{iK}β_K + ε_i$ . The model specifies a linear relationship between $y$ and $x_1,..., x_K$.
+- A2. Full rank: There is no exact linear relationship among any of the independent variables in the model. This assumption will be necessary for the estimation of the parameters of the model.
+- A3. Exogeneity of the independent variables: $E [ε_i | x_{j1}, x_{j2},..., x_{jK}] = 0$. This states that the expected value of the disturbance at observation $i$ in the sample is not a function of the independent variables observed at any observation, including this one. This means that the independent variables will not carry useful information for prediction of $ε_i$ .
+- A4. Homoscedasticity and nonautocorrelation: Each disturbance, $ε_i$ has the same finite variance, $σ_2$, and is uncorrelated with every other disturbance, $ε_j$ . This assumption limits the generality of the model, and we will want to examine how to relax it in the chapters to follow.
+- A5. Data generation: The data in $(x_{j1}, x_{j2},..., x_{jK})$ may be any mixture of constants and random variables. The crucial elements for present purposes are the strict mean independence assumption A3 and the implicit variance independence assumption in A4. Analysis will be done conditionally on the observed X, so whether the elements in X are fixed constants or random draws from a stochastic process will not influence the results. In later, more advanced treatments, we will want to be more specific about the possible relationship between $ε_i$ and $x_j$.
+- A6. Normal distribution: The disturbances are normally distributed. Once again, this is a convenience that we will dispense with after some analysis of its implications.
+
+*Source: Greene (2020)*
+
+#>
+
+We start with the basic linear model and the following formula: 
+
+$$Log\_GDP\_95_{i}=\beta_{0}+\beta_{1} \cdot exprop_{i}+u_{i}$$
+where $Log\_GDP\_95$ is the income per capita in country $i$, $exprop_i$ is the protection against expropriation measure, and $u_{i}$ is a random error term. The coefficient of interest throughout the paper is $\beta_{1}$, with which we aim to measure the causal effects of institutions on income per capita.
+
+Now let us run the regression with the command `lm()` which can be used for linear models. In the basic form command `lm()` requires dependent and explanatory variable linked with `~` sigma as first argument and `data = ...` as a second one. There is no need to specify constant as lm automatically includes it by default. Let us call this command to build the regression similar to the formula above.
+
+```{r "Task 3.1.1"}
+#< fill_in
+#First in the beginning of each exercise, we load the data again in order to make it possible to solve exercises in any order.
+data_base = readRDS("data_base.RDS")
+
+#Now call the command 'lm()" in the following format: lm(dependent variable ~ explanatory variable, data = ...). We save the regression under the name `reg_1_1`:
+
+reg_1_1 = ___(___ ~ ___, data = data_base)
+reg_1_1
+#>
+data_base = readRDS("data_base.RDS")
+reg_1_1 = lm(log_gdp_95 ~ exprop, data = data_base)
+reg_1_1
+```
+
+Great, the regression is built. However, the current output is quite limited, as we can only see the estimated coefficients.
+
+We can call a `summary()` command to obtain a more detailed output, but we will use a better-looking version from the `stargazer` package. Command `stargazer()`allows us to create nice tables as they are printed in articles with many columns from different regressions, and to directly compare the results.
+
+Load the package `stargazer` and call the command `stargazer()` with regression name as a first argument and `type = "html"` as a second one. 
+
+```{r "Task 3.1.2", results="asis"}
+#< fill_in
+#Load the package `stargazer` and replace both ___ in the command `stargazer()` with 2 regression names as a first and second arguments and `type = "html"` as a third one:
+library(stargazer)
+stargazer(___, ___, type = "html")
+#>
+
+library(stargazer)
+stargazer(reg_1_1, type = "html")
+
+```
+
+Numbers in columns indicate the estimates of the coefficients, and their standard errors are in parentheses. This format is standard practice for recording the results of econometric simulations, as it allows the reader to gauge the accuracy of the results and estimate the confidence intervals for the coefficients. At the bottom of the table, among other indicators, you can find the R-squared coefficient.
+
+If we wanted to write the estimated regression equation, we would then record it as follows:
+
+$$\widehat{Log\_GDP\_95_{i}}=4.660+0.522 \cdot exprop_{i}$$
+
+Alright, let us now examine the meaning of these estimates.
+
+#< quiz "Its a trap 3"
+question: Assuming that all assumptions of the OLS model are fulfilled and looking at the estimates of the coefficients, can we always interpret any number in the table in terms of its impact on the dependent variable?
+sc:
+    - Yes, the true value of the dependent variable should change accordingly to the estimated coefficient given the change of explanatory variable
+    - No, we should first check whether the actual coefficient is not zero*
+success: Correct, we should always check whether the coefficient is statistically significant.
+failure: Try again.
+
+#>
+
+Well done, not all coefficients can always be interpreted. This is because $\beta_1$ and $\beta_2$ are are only estimates obtained by using OLS on the basis of a given random sample. Consequently, they are random variables that can take on values that are only “approximately” equal to the true ones. Therefore, even if the true value of the coefficient is zero, its estimate is likely to deviate from zero. Therefore, it is necessary to be able to determine whether the coefficient differs strongly enough from zero, so that one can confidently assert that the true value of the coefficient is also not equal to zero.
+
+### Statistical significance
+
+In the info block below you will find a detailed procedure for testing the insignificance of the coefficient.
+
+#< info "Procedure to test for insignificance of the coefficient"
+
+The procedure for testing the insignificance of the coefficient looks like this:
+
+1. We formulate the tested hypothesis $H_0:\beta_{2} = 0$ (“the variable x does not affect the variable y”) and the alternative hypothesis $H_1: \beta_{2} ≠ 0$ (“the variable x affects the variable y”).
+2. Then we calculate the value of the test statistics by the formula $\frac{\hat{\beta_{2}}}{se(\hat{\beta_{2}})}$
+3. Afterwards we choose the significance level $\alpha$. The level of significance in mathematical statistics is the probability of a type 1 error, i.e. the probability of rejecting the hypothesis being tested, provided that, in fact, this hypothesis is correct. Of course, we would like to make mistakes not too often, so this probability is usually chosen small. The most commonly used levels of significance in econometrics are 1% and 5%. 
+4. From the tables of the Student's distribution, we find the critical value of the test statistic $t^{\alpha}_{n-2}$ for the chosen level of significance and the so-called number of degrees of freedom, which in our case is equal to $(n − 2)$.
+5. If $|\frac{\hat{\beta_{2}}}{se(\hat{\beta_{2}})}|>t^{\alpha}_{n-2}$, i.e. the coefficient is large enough in absolute value, one should reject the hypothesis $H_0: \beta_{2} = 0$ and draw a conclusion in favor of the alternative hypothesis, i.e. conclude that the variable $x$ affects the variable $y$. In this case, the variable $x$ is called statistically significant at the significance level $\alpha$. Otherwise, accordingly, the hypothesis $H_0$ cannot be rejected, and the variable $x$ is called statistically insignificant at the significance level $\alpha$.
+
+*Source: Wooldridge (2018), ch. 4*
+#>
+
+#< quiz "Shortcut"
+question: Do we always need to follow this complicated process in order to decide on the significance of the coefficients?
+sc:
+    - Unfortunately, yes
+    - No, there must be a shortcut*
+success: Correct. Let's discuss it below.
+failure: Try again.
+
+#>
+
+Luckily, there is an alternative way to do so. We can use the so-called p-value to test the hypothesis.
+
+#< info "p-value"
+
+The p-value is the level of significance at which the hypothesis being tested is on the verge of rejection and acceptance.
+
+It is very simple to use the p-value when making a decision: if it is less than the preselected significance level $\alpha$, then the hypothesis being tested is rejected at the significance level $\alpha$. For example, if, when testing the insignificance of a coefficient, you use the $5%$ significance level ($\alpha = 0.05$), and the p-value is $0.0002$, you should conclude that the corresponding coefficient is significant. 
+
+The convenience of using the p-value lies in the fact that this value is automatically calculated by all standard econometric packages, so you do not need any distribution tables or additional calculations to make a decision about the significance or insignificance of the coefficient (as well as for carrying out any other tests that we will discuss below).
+
+#>
+
+In the summary table we can see small stars near each of the coefficients, which are basically the indication of p-values. It is also written in a note, where 1 star $(*)$ means that p-value is less than $0.1$, 2 stars $(**)$ mean that p-value is less than $0.05$, and 3 stars $(***)$ means that p-value is less than $0.01$. As discussed in the info block above, the lower the p-value, the more we can be sure that the coefficient is actually significant.
+
+#< quiz "Significant significance"
+question: Are coefficients in our regressions significant?
+sc:
+    - Both are insignificant
+    - Only `exprop` is significant
+    - Only `constant` is significant
+    - Both are significant*
+success: Correct!
+failure: Try again.
+
+#>
+
+### R-squared
+
+Let’s now get back to our regression summary. We can also see the R2 value, which is equal to 0.540 in the regression.
+
+#< info "R-squared, a.k.a. coefficient of determination"
+
+This R2 is called *coefficient of determination*, denoted as $R2$ or $R^2$ and pronounced as "R-squared". It is the proportion of the variation in the dependent variable (`log_gdp_95` in our case) that is predictable from the independent variable (`exprop`). It provides a measure of how well observed outcomes are replicated by the model and normally $R^2 ∈ [0; 1]$. The better our regression line fits the data, the closer this coefficient is to one. Conversely, the worse our equation is in agreement with actual observations, the closer it is to zero. In practice, however, one will likely never see a value of 0 or 1 for R-squared. 
+
+Adjusted R-squared shown below R-squared is almost the same, but it penalizes the statistic as extra variables are included in the model. It can be useful when the researcher includes lots of irrelevant variables, but this is not our case.
+
+*Source: Greene (2020)*
+
+#>
+
+In our summary, the R-squared of the regression indicates that approx. 50 percent of the variation in income per capita is associated with variation in expropriation risk, which is already quite a lot taking into account that we have only included one explanatory variable while trying to predict such a sophisticated thing like GDP.
+
+### Interpretation of the coefficients
+
+Well done! Now it's finally time to interpret the coefficients. 
+
+In our case, we could say that if the quality of institutions exprop is increased by one unit, then we predict the logarithm of the income per capita `Log_gdp_95` to increase by 0.52, but this is not very informative. We would like to see the actual relation between the income and quality of institutions, not logarithms, which brings us to another important point in the interpretation of the coefficients. If you are already familiar with different types of models, just skip the info block and start with the next quiz, otherwise, I recommend reading it.
+
+#< info "How to interpret variables in models with logarithms?"
+
+In the linear model $$y_{i} = \beta_{1} + \beta_{2} \cdot x_{i} + u$$ the coefficient of the variable $x_i$ can be interpreted as follows: an increase in the variable $x_i$ by one unit leads to an increase in the variable $y_i$ by $\beta_2$ units. However, in a logarithmic model, the interpretation of the $\beta_2$ coefficient will be different. We will not dive into mathematics here, you can always find that in the internet, but it is important to cover different types of models and ways to interpret the coefficients:
+
+- $y = \beta_1 + \beta_2 \cdot x$ | An increase in $x$ by one leads to an increase in $y$ by $\beta_2$ units
+- $y = \beta_1 + \beta_2 \cdot log\_x$ | An increase in $x$ by one percent leads to an increase in $y$ by $\beta_2/100$ units
+- $log\_y = \beta_1 + \beta_2 \cdot x$ | An increase in $x$ by one increases $y$ by $(e^{\beta_2} −1)⋅100\%$, which can be approximated as $\beta_2 \cdot 100\%$ when $\beta_2$ is close to zero
+- $log\_y = \beta_1 + \beta_2 \cdot log\_x$ | An increase in $x$ by one percent leads to an increase in $y$ by $\beta_2$ percent
+
+#>
+
+Now let's interpret the coefficient in the informative way. You can use the chunk for calculations, if necessary.
+
+```{r "Task 3.1.3", optional = TRUE}
+#< task_notest
+
+#>
+```
+
+#< quiz "Interpretation 1"
+
+question: Based on the 1995 regression, how should income per capita change (exactly) if `exprop` increases by one?
+sc:
+    - It is predicted to increase by 0.522
+    - It is predicted to increase by 52.2%
+    - It is predicted to increase by 0.685
+    - It is predicted to increase by 68.5%*
+success: Well done! We need to calculate (exp(0.522) - 1)⋅100% = 68.5% in order to get the correct number.
+failure: Try again.
+
+#>
+
+#< award "Master of interpretations"
+Congratulations, now you know how to correctly interpret coefficients in different types of regressions and will not be confused even in a complicated case!
+#>
+
+
+### Magnitude of the effect of institutions
+
+At this point, we have had a look at the variables and their relation, but the magnitude of the effect of institutions on GDP is still not intuitively clear. We have seen that different countries have different scores, but we have not seen a practical example of associated differences in GDP.
+
+In order to fill this gap, we will use the same approach as the authors and will take 2 countries from the sample. We will take those that stand in approximately 25th and 75th percentiles of the institutional measure in this sample. This approach will help us to interpret variables in a more intuitive way as well as to assess the magnitude of the analyzed effect.
+
+```{r "Task 3.1.4"}
+#< task
+#We would like to select only the necessary columns from the dataset (country code, expropriation risk and logarithm of its 1995 GDP) and then get one value on the basis of 25th percentile of `exprop`. For this we will use select function with a very simple syntax, reflecting a vector of columns to be subset.
+Q25 = data_base %>%
+      select(c(country, exprop, log_gdp_95)) %>%
+      filter(exprop > quantile(exprop, 0.25) & exprop < quantile(exprop, 0.26))
+Q25
+#>
+```
+
+We have found a country that stands in the ~25th percentile. It is Bolivia with `exprop` rating of 5.64 and `log_gdp_95` of 7.93.
+
+Now let's also find a country in the ~75th percentile:
+```{r "Task 3.1.5"}
+#< task
+#Subset country code, expropriation risk and logarithm of its GDP on the basis of 75th percentile of `exprop`.
+Q75 = data_base %>%
+      select(c(country, exprop, log_gdp_95)) %>% 
+      filter(exprop > quantile(exprop, 0.74) & exprop < quantile(exprop, 0.75))
+Q75
+#>
+
+```
+
+It is Colombia with an `exprop` rating of 7.32 and `log_gdp_95` of 8.81.
+
+```{r "Task 3.1.6"}
+#< fill_in
+
+#We will also bind both outputs with the help of the command rbind(), which can be used to combine several vectors, matrices and/or data frames by rows. Fill in the ___ with the vectors from the previous chunks.
+rbind(___, ___)
+
+#>
+rbind(Q25, Q75)
+```
+
+So the actual difference in income between these countries is $8.81 - 7.93 = 0.88$ log-points, or $(e^{0.88}-1) \cdot 100\%=141\%$.
+Predicted by the model is $0.522 \cdot (7.32 - 5.64) = 0.88$ or also $(e^{0.88}-1) \cdot 100\%=141\%$.
+
+As we have just seen, the estimated effect implies a strong effect of institutions on performance and even seems to match the actual picture we see in the sample. Remember that we also saw that the coefficients are significant and R-squared is high enough.
+
+#< quiz "Its a trap 4"
+
+question: Does this example mean that the model would always precisely predict the growth of GDP based on change of expropriation risk?
+sc:
+    - Yes, since the predicted percentage change exactly matches the observed one
+    - No, since it is likely that we were lucky with the chosen figures this time*
+success: Well done! Although such a precise coincidence might look strange at first, it is still mostly a coincidence as both observations lie on the regression line. Taking 2 other countries would yield different result, and the deviation would be higher.
+failure: Try again.
+
+#>
+
+#< award "Astuteness is the key"
+Congratulations! You are attentive to details and question the results, which is a very important quality of a good researcher. Keep on!
+#>
+
+
+## Exercise 3.2: Bias, endogeneity & control variables
+
+In this exercise, we will consider more advanced points like omitted variable bias and endogeneity problems. Moreover, we will check whether we can interpret the results of the simple OLS model in a causal way.
+
+### Facing the bias
+
+**We have seen that the regression can sometimes precisely predict the change in GDP based on the change in expropriation risk rating. But does this method help us to derive an unbiased estimator of the causal effect of quality of institutions on GDP?**
+
+**The answer is no. The first reason is that there should be other variables that impact the GDP, which leads to biased estimates.**
+
+Let us remember the form of the regression equation that we estimated with the OLS method:
+
+$$Log\ GDP\ 1995_{i}=\beta_{0}+\beta_{1} \cdot Protection\ against\ expropriation\ risk_{i} + u_{i}$$
+
+*Note: instead of `log_gdp_95` and `exprop` variables we write full names of the variables in this equation to make the idea more clear. In the R environment we still stick to the proper short names of the variables*
+
+The first problem that arises here is related to the explanatory variables that we use. Apart from the random error, which is always included in every model, we try to explain the variation in the level of income only by using the quality of institutions in the regression equation. But does it actually help to find the answer and reveal the causal relation?
+
+What if there are some other factors that influence both the quality of institutions and the level of income? One such factor could be geography, which likely had a direct impact on both quality of institutions and the level of income. For example, geography might define access to natural resources, which have an impact on GDP, and the country could have developed neighbors and improved institutions through relations with them.
+
+However, geography is certainly a very broad term, and we need to find some more specific factors that we can use as a proxy. In our paper authors mention, that other social scientists like Montesquieu (1989), Diamond (1997) and Sachs and coauthors (1998) have argued for a direct effect of climate on performance, and Gallup, Mellinger, and Sachs (1998) and Hall and Jones (1999) found the correlation between distance from the equator (latitude) and economic performance. We will use latitude as a proxy for geography, as we also have latitude values in our dataset.
+
+Given this logic, let us assume here that the “true” data generating process includes latitude and looks like that:
+
+$$Log\ GDP\ 1995_{i}=\beta_{0}+\beta_{1} \cdot Protection\ against\ expropriation\ risk_{i} + \beta_{2} \cdot Latitiude_{i} + \epsilon_{i}$$
+
+What then happens when we estimate the OLS regression without latitude like we did before?
+
+![Comparison of short and long regressions](Long-short equation.png)
+
+*Source: own illustration*
+
+In our original OLS specification ("Short regression") with only one explanatory variable (Protection against expropriation risk, variable `exprop`) used in the regression, the unobserved error $u_i$ was actually of the form $\beta_{2} \cdot Latitude_{i} + \epsilon_{i}$, but other variables (Latitude) were considered all together mistakenly as random errors in $u_i$, were actually impacting $Protection\ against\ expropriation\ risk_i$ and biasing its estimator.
+
+If this is the case, a so-called omitted variable bias arises. This violates the exogeneity assumption of the OLS (return to the info block covering the OLS assumptions, if necessary). Therefore, we cannot make any relevant conclusions if the effect on GDP is exclusively because of the $Protection\ against\ exproprtiation\ risk_i$ or if there are others variables that could actually influence $Protection\ against\ exproprtiation\ risk_i$ to be significant in explaining $Log\ GDP\ 1995_i$.
+
+Graphically this can be shown in the following way:
+![Comparison of short and long regressions](Long-short DAG.png)
+
+*Source: own illustration*
+
+Such situation depicts a problem known as **endogeneity**. If the explanatory variable is endogenous, then the results of modeling cannot be interpreted in terms of causation. 
+
+#< info "Exogeneous and endogeneous explanatory variables"
+Explanatory variable is called **exogeneous** if it is not correlated with the error term. This means that for example that $Cor(exprop_i, u_i) = 0$. If there is some correlation between the explanatory variable and the error term which means for example that $Cor(exprop_i, u_i) \neq 0$ we say the variable is **endogeneous**. 
+
+*Source: Wooldridge (2018), ch. 3*
+#> 
+
+We will dive into the general endogeneity problems deeper a bit later, but now let us focus on the bias first.
+
+We know that the bias is likely present in the OLS model, so we could also predict the direction of bias that occurs when the model omits a confounding variable like latitude by analyzing the relation between the variables.
+
+In the picture above there are (+) signs next to arrows that show positive type of the relation between the variables based on the following:
+- Better protection against expropriation risk is associated with higher GDP
+- Higher latitude means that the country lies farther from the equator, which should be associated with higher GDP (since African countries are closer to equator than European countries / Australia / Canada). 
+- Same logic applies to the protection against expropriation risk, however, it is not that obvious. 
+
+Estimating correlations can help to determine the direction of the relation (and even the direction of the bias itself). More details could be found in the info block below.
+
+#< info "Correlation structures as an approach to determine the direction of the bias"
+
+When we know that the bias is likely present in our model and when we know the confounding variable (like latitude in our case), we could predict the direction of bias that occurs when the model omits a confounding variable like geography with the help of the correlation structures. The direction depends on:
+- the correlation between the included and omitted independent variables
+- the correlation between the included independent variable and the dependent variable.
+
+The direction of bias on the basis of correlations between omitted confounder and included variables is summarized in the table below:
+
+![Direction of bias](Bias.png)
+
+*Source: https://www.statology.org/omitted-variable-bias/, own illustration*
+
+These estimates could help in answering the quiz below.
+
+#>
+
+As stated in the info block above, correlations might help to confirm our hypothesis about the relation of the variables.
+```{r "Task 3.2.1"}
+#< fill_in
+
+data_base = readRDS("data_base.RDS")
+
+#Replace the ___ with the correct variables to calculate the correlation between latitude and protection against expropriation risk as well as between latitude and log GDP 1995.
+
+cor(data_base$latit, data_base$___)
+cor(data_base$___, data_base$log_gdp_95)
+
+#>
+data_base = readRDS("data_base.RDS")
+cor(data_base$latit, data_base$exprop)
+cor(data_base$latit, data_base$log_gdp_95)
+```
+
+
+#< quiz "Bias"
+
+question: Which direction of bias could we expect, if we assume that the omitted variable is the only source of the bias? What would be the impact on the coefficient?
+sc:
+    - Positive, which means that the OLS coefficient should be underestimated
+    - Positive, which means that the OLS coefficient should be overestimated*
+    - Negative, which means that the OLS coefficient should be underestimated
+    - Negative, which means that the OLS coefficient should be overestimated
+success: Well done! In our case we could expect a positive bias, and it generally leads to an overestimated OLS coefficient.
+failure: Try again.
+
+#>
+
+The explanatory variable `Protection against expropriation risk` and the omitted confounder `Latitude` have a positive relationship. The omitted confounder `Latitude` and the dependent variable `Log GDP 1995` also have a positive relationship, which indicates that we can expect a positive bias, i.e. the coefficient in the OLS model that we calculated in the previous exercise ($0.522$), should be overestimated.
+
+Let us check this assumption:
+```{r "Task 3.2.2", results = "asis"}
+#< fill_in
+
+#Since this is a new erxercise, we have to replicate the reg_1_1 first:
+reg_1_1 = lm(log_gdp_95 ~ exprop, data = data_base)
+
+#Now replace ___ in the code to run a regression with latitude. We want to use base sample.
+reg_1_2 = lm(log_gdp_95 ~ ___ + ___, data = data_base)
+
+#Show summary of these regressions with the help of the command `stargazer()` by just adding all regression names as arguments.
+stargazer(___, ___, type = "html")
+#>
+
+reg_1_1 = lm(log_gdp_95 ~ exprop, data = data_base)
+reg_1_2 = lm(log_gdp_95 ~ exprop + latit, data = data_base)
+stargazer(reg_1_1, reg_1_2, type = "html")
+```
+
+We can see that the assumption about the direction of bias was correct, as we see that adding `Latitude` decreases the coefficient from $0.522$ to $0.468$ (talking about predicted $\%$ change in GDP per capita when `exprop` increases by $1$, it decreases from $68.5 \%$ estimated in the "Short regression" to $59.7 \%$ in the "Long regression").
+
+Such variables that we add to the model (like `Latitude` in our case) to eliminate the bias in the estimate of the coefficient of interest are called **control variables**. 
+
+- A variable of interest is a factor whose influence on the dependent variable we are interested in (i.e. `exprop`)
+- Control variables (e.g. `latitude`) are variables that we include in the model in order to avoid bias in the coefficient for the variable of interest and associated endogeneity problems.
+
+In order to avoid this bias and potential endogeneity problems, it is necessary to take into account all significant factors in your regression, which almost always makes us analyze the multiple regression model with control variables.
+
+Let us first suppose that we have the missing variable data. Then, as you have probably already guessed, we just need to add the missing variable to the model to solve the problem.
+
+In practice, there are often several missing variables (since the world is complex and the dependent variable is usually influenced by many factors at once). Well, then you need to add them all.
+
+But what variables should we add to the model first? As discussed earlier, geography, as the location of the country has a huge impact on soil quality, amount of resources, length of the day and night, temperature, and climate. It can even be the case that the entire correlation is spurious, i.e. that there is actually no causal relationship between economic development and institutions. For example, suppose that there is no direct link between economic development and institutions, and the observed correlation is driven by a third factor like geography.
+
+Let us include latitude and continent dummies in the regression equations so that they will now look like this:
+
+$$Log\ GDP\ 1995_{i}=\beta_{0}+\beta_{1} \cdot Protection\ against\ expropriation\ risk_{i} + X'_{i} \cdot \gamma+\nu_{i}$$
+
+where $X_i$ is a vector of added covariates.
+
+Below you will find some additional information about the usage of dummy variables in the
+regression and their interpretation.
+
+#< info "Dummy variables in the regression"
+
+Sometimes we may need to take into account not only quantitative but also qualitative characteristics as explanatory factors. For example, the price of an apartment can be influenced not only by its living area and the distance to the nearest subway station (quantitative variables) but also by construction material or the presence of a balcony in this apartment (qualitative variables). Then it is convenient to use so-called dummy variables that take one of the two values - 0 or 1. Dummy variables are easily created and nice to interpret as the coefficient of the indicator variable shows the difference between the two groups that are coded with 0 and 1.
+
+In our case, we use dummy variables indicating if the country is located on a specific continent. Dummy variable `africa` is equal to 1 if the country is located in Africa and 0 if not. Suppose that we only use `africa` as an explanatory variable. Then the coefficient in front of `africa` will show the average difference in logarithm of income per capita between countries located in Africa and on other continents. 
+
+#>
+
+Let us now build respective regressions and have a look at the results:
+```{r "Task 3.2.3", results="asis"}
+#< fill_in
+#Add latitude and continent dummies for Asia and Africa.
+reg_1_3 = lm(log_gdp_95 ~ exprop + ___ + ___ + ___ + other, data = data_base)
+
+#Show summary of all 3 regressions including those from the previous task:
+stargazer(___, ___, ___, type = "html")
+
+#>
+reg_1_3 = lm(log_gdp_95 ~ exprop + latit + asia + africa + other, data = data_base)
+stargazer(reg_1_1, reg_1_2, reg_1_3, type = "html")
+
+```
+
+In the `reg_1_3` we have included dummy variables `asia`, `africa` and `other`. However, there are countries in the dataset like Argentina that are not in Asia, Africa or `other` group. This is because there is one implicit group that includes countries located in America, but there is no separate column in the dataset as well as we do not include this group in the regressions.
+
+#< info "Why don't we simply add the dummy for America?"
+
+If we do so, we will encounter so-called pure multicollinearity, which would mean that we face a strict linear relationship between the variables of the model. In this case, it would be impossible to evaluate a model that includes a constant and all these variables, and the coefficient estimates may change erratically in response to small changes in the model or the data.
+
+The situation where pure multicollinearity arises due to the addition of an excessive number of dummy variables to the model is called a dummy variable trap. However, we can easily avoid it by simply adding $(m - 1)$ dummy variables in the model with $m$ categories. The omitted category will be the default case with which all other categories will be compared when interpreting the coefficients. The default case in our specification is therefore America.
+
+*Source: Wooldridge (2018), ch. 7*
+#> 
+
+Let us now look at the results of the regressions.
+
+#< quiz "Choosing favourites"
+
+question: Which regression specification (1, 2 or 3) better fits the observed data?
+sc:
+    - 1
+    - 2
+    - 3*
+    - Cannot say
+success: Well done! Well done! R-squared provides a measure of how well observed outcomes are replicated by the model, and the 3rd model has the highest R-squared and adjusted R-squared coefficients.
+failure: Try again.
+
+#>
+
+For the next quiz you might want to calculate some numbers, you can use the chunk below for calculations, if necessary.
+
+```{r "Task 3.2.4", optional = TRUE}
+#< task_notest
+
+#>
+```
+
+#< quiz "Interpretation 2"
+
+question: How can we interpret coefficient if front of `africa` variable in the regression (3)? Use exact calculations.
+sc:
+    - All other factors fixed, income per capita in African countries is predicted to be on average 88.1% lower than in all other countries
+    - All other factors fixed,, income per capita in African countries is predicted to be on average 58.6% lower than in all other countries
+    - All other factors fixed, income per capita in African countries is predicted to be on average 88.1% lower than in American countries
+    - All other factors fixed, income per capita in African countries is predicted to be on average 58.6% lower than in American countries*
+success: Well done! We should calculate as (exp(-0.881)-1)*100% = -58.6%.
+failure: Try again.
+
+#>
+
+As we have seen, control variables like latitude or dummies continents actually have some portion of the influence that was previously attributed to expropriation risk. Therefore, we see that the coefficient in front of `exprop` decreases from  $0.522$ in the first model to $0.401$ in the third one. Notice that latitude is statistically significant only in the equation $(2)$, while not all continent dummies are significant in the $(3)$.
+
+**In most further regressions we will add latitude as a control variable to account for the potential impact of geography. Authors provide regressions both with and without latitude for each case, but we will not do so to save time and space. This will not influence our conclusions and we will not miss anything important though.**
+
+#< quiz "To be on the right track"
+
+question: Fundamentally, will including more control variables improve the quality of causal inference in our model?
+sc:
+    - Yes, including several control variables has already helped. Let's think of more of them!
+    - No, we will unlikely be able to include all necessary control variables and need another approach to overcome fundamental endogeneity problems.*
+success: Correct, you are thinking in the right direction. Let us continue with the details below.
+failure: Try again.
+
+#>
+
+Although it is true that there could be lots of other factors not represented in our model such as predominant religion, colonizer country, or ethnolinguistic diversity which could be highly correlated with quality of institutions and impact economic performance at the same time, we should not start with extending the model with all of these variables.
+
+**Although results of the regressions with control variables show a strong correlation between the quality of institutions and economic performance, we should still not interpret this relationship as causal, as there is a number of reasons to consider the model endogenous.**
+
+- Firstly, there could be many omitted determinants of income differences that will naturally be correlated with institutions, and it could be extremely difficult to take into account all of them with control variables.
+- Secondly, there might occur a reverse causality problem. We use `exprop` as a measure of the quality of current institutions, but perhaps it is not that countries with better institutions are getting richer, but rather that rich countries can afford better institutions.
+- Thirdly, there could be a lot of measurement errors. Indeed, it is unlikely that the index used (protection against expropriation risk) can ideally characterize such a complex concept as the quality of institutions and protection of property rights. Moreover, this rating of expropriation risk was constructed ex-post, and analysts, who are usual humans, may have had a natural bias in seeing better institutions in places they thought should have better institutions or just in richer ones.
+
+This is the end of this set of exercises. In the next set of exercises, we will continue to explore endogeneity problems and will try to find a way how to deal with them.
+
+#< award "45% completed"
+Congratulations! You are making progress and have just completed ~45% of the problem set. Continue with the next exercise to get one step closer to the end of the problem set.
+#>
+
+## Exercise 4.1: Instruments against endogeneity
+
+In this exercise, we will delve a bit deeper into endogeneity problems and ways to overcome them.
+
+Let us introduce one feature that will also help to better understand the logic of our steps, which will become slightly more complicated.
+
+We will visualize the model and all the next steps with the help of a Directed Acyclic Graph (DAG). For this, we can load the necessary packages `ggdag` and `dagitty`.
+
+*We will not deep dive into the way how DAGs can be constructed in R, but if you want to know more, you can always check it at https://cran.r-project.org/web/packages/dagitty/index.html and https://cran.r-project.org/web/packages/ggdag/index.html.*
+
+**_________________________________________________________________________________________________________________________________**
+
+**Disclaimer:**
+
+- From this moment on, we will use DAGs mostly for illustrative purposes to visually map the relation between variables and to understand the process more intuitively.
+
+- We keep using the same variable for random error on the DAGs although the composition of the error actually differs. Regressions that we will analyze reflect only part of these DAGs and are not always directly related to the picture.
+
+- Nodes are therefore not called as variables used in the regressions, but rather reflect the idea of the model.
+
+- The regression equations in the text blocks are also presented for illustrative purposes in order to demonstrate the logical structure and therefore do not include exact names of variables.
+
+**_________________________________________________________________________________________________________________________________**
+
+Let us now visualize our situation in order to understand better, how the endogeneity arises although we have included control variables in the model.
+
+**This DAG will look different from the DAGs we used in the previous exercise. This is a necessary measure to cover the next steps in an intuitive way. All following DAGs will have a similar look to the one we build now.**
+
+```{r "Task 4.1.1"}
+#< task
+#First we load the necessary packages:
+library(ggdag)
+library(dagitty)
+
+#Set a good-looking visual theme:
+theme_set(theme_dag())
+
+#Code a DAG internal structrue:
+dag_1 <- dagitty('dag {   I <-> Y <- v
+                         v -> I <- X -> Y
+  I [pos="0,0"]
+  v [pos="0,1"]
+  Y [o, pos="1,0"]
+  X [pos="0.5,-0.5"]
+   }') %>% 
+  dag_label(
+    labels = c(
+      "I" = "Quality of Institutions", 
+      "Y" = "Level of Income", 
+      "v" = "Error",
+      "X" = "Geography"))
+
+#Plot the DAG itself:
+ggdag(dag_1, use_labels = "label")
+
+#>
+
+```
+
+
+#< award "R functionality user"
+
+Impressive, isn’t it? You now see that R is a very flexible instrument and that various operations can be performed with the help of additional packages. Remember that R functionality is very broad and one can use it not only for regressions, charts, and tables.
+
+#>
+
+Although the look is somewhat different, on this DAG we can clearly see the situation as well: Error term $u$ influences both quality of institutions $I$ and level of income $Y$, and there are some other confounding factors like geography that also impact $I$ and $Y$.
+
+Earlier we have already discussed the omitted variable bias and explained how explanatory variable may be correlated with the error term, and even tried to solve this problem. Indeed, the first problem described above can be partially solved by including a lot of control variables in the model. However, we can only overcome the other two difficulties by applying a specific method, which is called **instrumental variable estimation**.
+
+As was mentioned earlier, our base sample includes countries that were once colonized by European countries. In this setting we dispose a number of economies with relatively similar income levels 400 years ago but where we observe large differences in per capita income in 1995, and authors of the paper state that colonization experience played a significant role in shaping institutions in these countries.
+
+In order to understand the relationship better, we will use backward induction to finally arrive at the exogenous factor that could have defined the way we see institutions in these countries now. In other words, all we need is to find some factor that can be a source of exogenous variation, called an **instrument**.
+
+Moreover, the instrument that we will use should satisfy two important conditions:
+- **relevance**: $Cov(exprop_i, instrument_i)\neq 0$;
+- **exogeneity**: $Cov(instrument_i, u_i) = 0$.
+*Source: Wooldridge (2018), ch. 15*
+
+The first property says that this variable should be correlated with our endogenous regressor. The second property requires that this variable should not be correlated with the random error of the model.
+
+Graphically, the relationship between variables is shown in the figure below:
+
+![Note: uncrossed arrows indicate correlation, crossed out arrows indicate no correlation.](Instrument.png)
+
+*Source: own illustration*
+
+## Exercise 4.2: Choice of the plausible instrument
+
+In this exercise, we would like to find any factor that can be a source of exogenous variation in institutions in order to overcome endogeneity problems later.
+
+We will use backward induction step-by-step to finally arrive at the exogenous factor that can be a source of exogenous variation in quality of institutions.
+
+### Persistence of institutions
+
+First of all, it is logical to assume that current institutions are very strongly related to past institutions, i.e. that they tend to persist for quite a long time.
+
+- To start with, it is costly to set up functioning institutions, which place restrictions on government power and protect property rights (Acemoglu and Verdier, 1998). If the money is already spent, it is often not in the interest of the elites to switch from this set of institutions to extractive institutions, but it is rather more rational to exploit the present system. In case that extractive policy was applied earlier, the new elites will also less likely want to incur the costs of introducing better institutions, and may instead prefer to exploit the existing extractive institutions for their own benefits.
+
+- Secondly, the size of the ruling elite may impact gains from the extractive strategy. This can be well illustrated with a cake and number and size of pieces that it could be cut in. The smaller the ruling elite is, the greater incentive it has to continue with the extractive policy (Acemoglu and Robinson, 2000). Authors of the paper state that in many cases where European powers set up authoritarian institutions, they delegated the day-to-day running of the state to a small domestic elite, which favored extractive institutions even after the independence.
+
+- Finally, Acemoglu (1995) emphasizes that agents will be more likely to support institutions in case they made complementary irreversible investments, e.g. those who invested a lot in human and physical capital will be more likely eager to spend additional money to enforce property rights, while those who have less to lose will not be.
+
+Therefore, we can expand our DAG to include this feature.
+
+```{r "Task 4.2.1"}
+#< task
+dag_2 <- dagitty('dag {   C -> I <-> Y <- v
+                         v -> I <- X -> Y
+  I [pos="0,0"]
+  v [pos="0,1"]
+  Y [o, pos="1,0"]
+  X [pos="0.5,-0.5"]
+  C [pos="-0.5,0.1"]
+   }') %>% 
+  dag_label(
+    labels = c(
+      "I" = "Quality of Institutions", 
+      "Y" = "Level of Income", 
+      "v" = "Error",
+      "X" = "Geography",
+      "C" = "Early institutions"))
+
+ggdag(dag_2, use_labels = "label")
+#>
+
+```
+
+What we are interested in is the relation between early institutions and quality of institutions. Now let us build a regression in order to check whether we could confirm correlation of past and current institutions.
+
+The regression equation should have the following logical structure: $$Quality\ of\ institutions_{i}=\beta_{0}+\beta_{1} \cdot Early\ institutions_{i} + X'_{i} \cdot \gamma+\epsilon_{i}$$, where $X_i$ is a vector of other added covariates.
+
+```{r "Task 4.2.2"}
+#< task
+#Here we again first load the data and necessary package that we will use in the next chunks. 
+data_base = readRDS("data_base.RDS")
+library(stargazer)
+#>
+```
+
+In the next code chunk we will build the regressions with a measure of early institutions as an explanatory variable and quality of institutions (expropriation risk) as a dependent one. There is no certain approach to define “early institutions”, so authors proxy them in 2 ways: constraints faced by the executive in 1900 and democracy index in 1900. In all specifications we also add the latitude variable in order to control for possible geographic factors.
+
+```{r "Task 4.2.3", results="asis"}
+#< task
+#Build regressions:
+reg_2_1 = lm(exprop ~ cons_1900 + latit, data = data_base)
+reg_2_2 = lm(exprop ~ democ_1900 + latit, data = data_base)
+
+#Show results:
+stargazer(reg_2_1, reg_2_2, type = "html")
+#>
+
+```
+
+Column $(1)$ uses constraints faced by the executive in 1900 as the regressor, and shows a close association between early institutions and institutions today. For example, past institutions alone explain $24\%$ of the variation in the index of current institutions. The second column uses the democracy index as a proxy for early institutions instead of constraints on executive, and confirm the results (with even higher R-squared).
+
+*Note: Both constraints on the executive and democracy indices assign low scores to countries that were colonies in 1900, and do not use the earliest post-independence information for Latin American countries and Neo-Europes. Authors also use constraints on the executive in the first year of independence (in case the country was not yet independent in 1900) controlling separately for time since independence as a third variant of the regression. The results are similar and indicate that early institutions persist.*
+
+Alright, we saw that there is a positive correlation between current and early institutions. But can we proceed with it as an instrument?
+
+#< quiz "Choice of instrument 1"
+question: Can we use early institutions as an instrument?
+sc:
+    - Yes, both relevance and endogeneity conditions are fulfilled.
+    - No, relevance condition can be violated.
+    - No, exogeneity condition can be violated.*
+    - No, both relevance and exogeneity conditions can be violated.
+success: Well done! Early institutions can indeed reflect other characteristics that are important for income today which makes this identification strategy invalid. Although we cannot ascertain that, it might be the case since current income is a complex variable that can easily be partially defined not only by current institutions, but also by factors from the recent past. Long-lasting impact of the past on the current performance of the markets is also a reason why moving average is often used for technical analysis in trading, since it captures momentum.
+failure: Try again.
+
+#>
+
+If we incorporate the violation of the exogeneity condition on the previous DAG, it will look like this:
+```{r "Task 4.2.4"}
+#< task
+dag_3 <- dagitty('dag {   C -> I <-> Y <- v -> C <- X
+                         v -> I <- X -> Y
+  I [pos="0,0"]
+  v [pos="0,1"]
+  Y [o, pos="1,0"]
+  X [pos="0,-0.5"]
+  C [pos="-0.5,0.1"]
+   }') %>% 
+  dag_label(
+    labels = c(
+      "I" = "Quality of Institutions", 
+      "Y" = "Level of Income", 
+      "v" = "Error",
+      "X" = "Geography",
+      "C" = "Early institutions"))
+
+ggdag(dag_3, use_labels = "label")
+#>
+
+```
+
+At this step, it is now obvious that we should search further.
+
+### Early institutions and settlements
+
+We have already mentioned well-functioning and extractive institutions earlier. If we dig deeper here in order to better understand how they originated, we will find that each colonization policy could be attributed to a specific type with defined features, which later led to the creation of different sets of institutions. Two main types were “extractive states” and “settler colonies”.
+- The main purpose of the extractive state was to get as many resources of the colony as possible and to transfer them to the colonizer, preferably with the minimum amount of investment possible, a pure “short-term gain” for colonizers. Therefore, they did not develop or protect private property, nor did they provide checks and balances against government expropriation.
+- As concerns settler colonies, people were trying to model the life there after their home country and to replicate European institutions, with great emphasis on private property, and checks against government power. Denoon (1983) confirms that settler colonies developed representative institutions which promoted what the settlers wanted and that what they wanted was freedom and the ability to get rich by engaging in trade. Main examples of former settler colonies include Australia, New Zealand, Canada, and the United States of America.
+
+Overall, a key determinant of the form colonialism took was the presence or absence of European settlers. Therefore, we can incorporate a measure of European settlements in the colony proxied by a fraction of the population of European descent in 1900.
+
+Then we can further enlarge the DAG by adding this variable:
+```{r "Task 4.2.5"}
+#< task
+dag_4 <- dagitty('dag {   S -> C -> I <-> Y <- v -> C <- X -> S
+                         v -> I <- X -> Y
+  I [pos="0,0"]
+  v [pos="0,1"]
+  Y [o, pos="1,0"]
+  X [pos="-0.4,-0.5"]
+  C [pos="-0.75,0.1"]
+  S [pos="-1.5,0"]
+   }') %>% 
+  dag_label(
+    labels = c(
+      "I" = "Quality of Institutions", 
+      "Y" = "Level of Income", 
+      "v" = "Error",
+      "X" = "Geography",
+      "C" = "Early institutions",
+      "S" = "European settlements"))
+
+ggdag(dag_4, use_labels = "label")
+#>
+
+```
+
+Now let us build a necessary regression in order to check whether we could confirm the correlation of early institutions and settlements.
+
+The regression equation should have the following structure: $$Early\ institutions_{i}=\beta_{0}+\beta_{1} \cdot European\ settlements_{i} + X'_{i} \cdot \gamma+\theta_{i}$$, where $X_i$ is a vector of other added covariates (geography).
+
+Just press *check*.
+```{r "Task 4.2.6", results="asis"}
+#< task
+reg_2_4 = lm(cons_1900 ~ eur_1900 + latit, data = data_base)
+reg_2_5 = lm(democ_1900 ~ eur_1900 + latit, data = data_base)
+
+stargazer(reg_2_4, reg_2_5, type = "html")
+#>
+```
+
+The results of the regressions provide evidence in support of the hypothesis that early institutions were shaped, at least in part, by settlements. These regressions show that settlement patterns explain around $50$ percent of the variation in early institutions. Nevertheless, this variable also cannot be taken as an instrument due to the same reason as with early institutions - although it is relevant, it is likely not exogenous. For example, if Europeans were more likely to migrate to places with better resources and soil quality, and if resources and soil quality still had an effect on income, there would be a correlation between $European\ settlements$ (`eur_1900`) and $\Theta$ (Random error). 
+
+If we incorporate the violation of the exogeneity condition on the previous DAG, it will look like this:
+
+Just press *check*.
+```{r "Task 4.2.7"}
+#< task
+dag_5 <- dagitty('dag {   S -> C -> I <-> Y <- v -> C <- X -> S <- v
+                         v -> I <- X -> Y
+  I [pos="0,0"]
+  v [pos="-0.4,0.8"]
+  Y [o, pos="1,0"]
+  X [pos="-0.4,-0.5"]
+  C [pos="-0.75,0.1"]
+  S [pos="-1.5,0"]
+   }') %>% 
+  dag_label(
+    labels = c(
+      "I" = "Quality of Institutions", 
+      "Y" = "Level of Income", 
+      "v" = "Error",
+      "X" = "Geography",
+      "C" = "Early institutions",
+      "S" = "European settlements"))
+
+ggdag(dag_5, use_labels = "label")
+#>
+
+```
+
+And again, we should perform one more step to reveal the next underlying factor. We have already reached the measure of European settlements, but we could look at what defined these settlements.
+
+### Determinant of settlements
+
+#< quiz "Choice of instrument 2"
+question: Make a guess, what likely had the most impact on decisions where to make settlements?
+sc:
+    - The average temperature in the country
+    - Soil quality
+    - Distance to the potential colony
+    - Colonists' mortality rate*
+success: Correct! Who would want to have a better soil, climate or shorter distance to the home country if you simply cannot survive there, right?
+failure: Try again.
+
+#>
+
+Authors of the paper claim that the colonization strategy was influenced by the feasibility of settlements, i.e. extractive colonies were organized in places with less favorable disease environment to European settlement. At the same time, European colonialists brought better institutions to locations where they could safely settle.
+
+#< info "Mortality data"
+Authors use data on the mortality rates of soldiers, bishops, and sailors stationed in the colonies between the 17th and 19th centuries, largely based on the work of the historian Philip Curtin (1964 and 1998). Since these mortality rates refer to fairly homogeneous groups, they are comparable across countries.
+
+The standard measure is annualized deaths per thousand mean strength. This measure reports the death rate among 1000 soldiers where each death is replaced with a new soldier. Curtin (1989, 1998) reviews in detail the construction of these estimates for particular places and campaigns and assesses which data should be considered reliable. Curtin (1989), Death by Migration, deals primarily with the mortality of European troops from 1817 to 1848. At this time modern medicine was still in its infancy, and the European militaries did not yet understand how to control malaria and yellow fever. These mortality rates can therefore be interpreted as reasonable estimates of settler mortality. They are consistent with substantial evidence from other sources (see, for example, Curtin[1964, 1968]).
+
+One example comes from the Beauchamp Committee in 1795 which was set up to decide where to send British convicts, who had previously been sent to the U.S.. One of the leading proposals was the island of Lemane, 400 miles up Gambia river. The committee rejected this possibility precisely because they decided mortality rates would be too high even for the convicts. South-West Africa was also rejected for health reasons. The final decision was to send convicts to Australia.
+
+The eventual expansion of many of the colonies was also related to the living conditions there. In places where the early settlers faced high mortality rates, there would be less incentive for new settlers to come. Curtin (1964), for example, documents how early British expectations for settlement in West Africa were dashed by very high mortality among attempted settlers, about half of whom could be expected to die in the first year.
+
+#> 
+
+Although Europeans did not know how to control the diseases that caused these high mortality rates, there were very well informed about mortality rates faced by settlers at that time.
+
+Let us reformulate the logical chain that we have come to so far. We assume that settler mortality rates were a major determinant of settlements; that settlements were a major determinant of early institutions (in practice, institutions in 1900); that there is a strong correlation between early institutions and institutions today; and finally that current institutions have a first-order effect on current performance.
+
+It gives us the following DAG structure:
+```{r "Task 4.2.8"}
+#< task
+dag_6 <- dagitty('dag {   X -> M -> S -> C -> I <-> Y <- v -> C <- X -> S <- v
+                         v -> I <- X -> Y
+  I [pos="0,0"]
+  v [pos="-0.4,0.8"]
+  Y [o, pos="1,0"]
+  X [pos="-0.4,-0.5"]
+  C [pos="-0.75,0.1"]
+  S [pos="-1.5,0"]
+  M [pos="-2.5, 0.1"]
+   }') %>% 
+  dag_label(
+    labels = c(
+      "I" = "Quality of Institutions", 
+      "Y" = "Level of Income", 
+      "v" = "Error",
+      "X" = "Geography",
+      "C" = "Early institutions",
+      "S" = "European settlements",
+      "M" = "Mortality rate"))
+
+ggdag(dag_6, use_labels = "label")
+#>
+
+```
+
+Let us then check the hypothesis that settler mortality rates defined European settlements with our standard methodology. But first, a short quiz.
+
+#< quiz "Choice of instrument 3"
+question: If we had to choose, would we prefer to use the original mortality rate or its logarithm?
+sc:
+    - Original form of mortality rate
+    - Logarithm of mortality rate*
+success: Correct! Using the log rather than the original level ensures that the extreme African mortality rates do not play a disproportionate role, since taking log always reduces the volatility of numbers and helps to work with outliers.
+failure: Try again.
+
+#>
+
+The regression equation should have the following structure: $$European\ Settlements_{i}=\beta_{0}+\beta_{1} \cdot log\ (Mortality\ rate)_{i} + X'_{i} \cdot \gamma+u_{i}$$, where $X_i$ is a vector of other added covariates (geography).
+
+Now let's continue with the code:
+```{r "Task 4.2.9", results="asis"}
+#< fill_in
+#Regress measure of european settlements (variable `eur_1900`) on logarithm of mortality rate and include control variable for latitude. Then show summary with `stargazer()` command:
+reg_2_6 = lm(___ ~ ___ + latit, data = data_base)
+stargazer(___, type = "html")
+#>
+reg_2_6 = lm(eur_1900 ~ log_mort + latit, data = data_base)
+stargazer(reg_2_6, type = "html")
+
+```
+
+We can see that the results are quite optimistic with relatively high R-squared and all variables being statistically significant. Moreover, we have a negative coefficient estimate for logarithm of mortality, which means that with $1$ log point increase of mortality, the fraction of European population is decreasing by $7.1$, which stands for percentage points in our case. 
+
+Since we are choosing the instrument for the quality of institutions, we should check both the relevance and exogeneity conditions to be fulfilled.
+
+**Relevance**
+
+Although we have already seen necessary correlations in each stage of our chain of variables, it would also be useful to check the relation between mortality and the quality of institutions.
+
+For this we can plot these 2 variables:
+
+```{r "Task 4.2.10"}
+#< fill_in
+theme_set(theme_classic())
+#Replace two ___ in aes() commands to plot log mortality rate on x-axis and protection against expropriation risk on y-axis. After that also recall the command to add the regression line to the plot and replace ___ in the correct line with it.
+exprop_mort = data_base %>%
+    ggplot(aes(x = ___, y = exprop)) +
+    geom_point() + 
+    labs(x="Log of settler mortality rate", y = "Average protection against expropriation risk 1995")+ 
+    ___(method='lm', se = FALSE)
+
+#Plot it:
+exprop_mort
+
+#>
+theme_set(theme_classic())
+exprop_mort = data_base %>%
+    ggplot(aes(x = log_mort, y = exprop)) +
+    geom_point() + 
+    labs(x="Log of settler mortality rate", y = "Average protection against expropriation risk 1995")+ 
+    geom_smooth(method='lm', se = FALSE)
+exprop_mort
+```
+
+Now we run the regression to see more details:
+
+```{r "Task 4.2.11", results="asis"}
+#< fill_in
+#Regress protection against expropriation risk on log settler mortaility:
+reg_2_7 = lm(___ ~ ___ + latit, data = data_base)
+
+#Show results
+stargazer(reg_2_7, type = "html")
+
+#>
+reg_2_7 = lm(exprop ~ log_mort + latit, data = data_base)
+stargazer(reg_2_7, type = "html")
+```
+
+
+Both on the chart and in the regression results we can see an obvious pattern, which shows that ex-colonies where Europeans faced higher mortality rates have substantially worse institutions today. This notion confirms our assumption, so mortality fulfills the relevance condition.
+
+**Exogeneity**
+
+As concerns its exogeneity, this is a more sophisticated question. Our idea is to show that the mortality rates of European settlers more than 100 years ago have no effect on GDP per capita today, other than their effect through institutional development and conditional on the control variables included in the regression. The main problem is that we cannot say right away whether mortality rates could be correlated with other factors having a direct effect on the economic performance, and a more precise investigation is necessary.
+
+As we have already mentioned, it is quite logical to assume that a major determinant of settler mortality was the disease environment. At the same time, these diseases could have a lot of long-lasting negative effects that are still affecting current economic performance through other channels. It could be the decrease of life expectancy, inability to properly develop the healthcare and education systems, and so on.
+
+Authors state that deaths were mostly caused by malaria and yellow fever, but they also argue that these diseases had only limited effect on indigenous adults who had developed various types of immunities. They provide an example of Bengal and Madras (taken from Curtin (1968, Table 2)), where mortality rates of local troops were comparable to that of local British troops (11 and 13 compared to 15 in 1000), whereas when British troops came to these countries, their mortality rates jumped to numbers between 70 and 170 in 1000, what could be explained by lack of immunity, since these two diseases accounted for 80 percent of European deaths (Curtin, 1989 p. 30).
+
+Furthermore, Acemoglu et al. (2001) show that these areas in the tropical zone were richer and more densely settled in 1500 than the temperate areas later settled by the Europeans. This also supports the notion that the disease environment did not create an absolute disadvantage for these countries, therefore the fact that many African and Asian countries are poor today cannot be explained solely and directly by the unfavorable disease environment.
+
+Taking into account all of the above, we can logically assume that diseases affected European settlement patterns and the type of institutions they set up, but had little effect on the health and economy of indigenous people. Therefore, settler mortality fulfills both the relevance and exogeneity conditions and could be a plausible instrument for the quality of institutions.
+
+*Note: at this stage, we are only taking into account logical considerations to make a conclusion about the validity of the instrument. In the next exercise, we will use some formal tests to check necessary conditions.*
+
+## Exercise 4.3: IV regression
+
+In this exercise, we will continue to investigate the impact of the quality of institutions on the economic performance by applying the instrumental variables estimation and the 2- stage least squares method.
+
+In the previous chapter, we have already shown that the settler mortality could act as a plausible instrument for the quality of institutions, and if we use mortality as a source of exogenous variation for institutions, our DAG will have the following look:
+```{r "Task 4.3.1"}
+#< task
+theme_set(theme_dag())
+dag_7 <- dagitty('dag {   X -> M -> I <-> Y <- v -> I <- X -> Y
+  I [pos="0,0"]
+  v [pos="0.4,0.8"]
+  Y [o, pos="1,0"]
+  X [pos="0,-0.5"]
+  M [pos="-1, 0"]
+   }') %>% 
+  dag_label(
+    labels = c(
+      "I" = "Quality of Institutions", 
+      "Y" = "Level of Income", 
+      "v" = "Error",
+      "X" = "Geography",
+      "M" = "Mortality rate"))
+
+ggdag(dag_7, use_labels = "label")
+#>
+
+```
+
+In order to make use of the valid instrument, **two-stage least squares (2SLS)** method can be applied. In the info block below you will find some more information about it.
+
+#< info "2SLS"
+
+From the name, it is already clear that the realization of this method consists of 2 steps. Each of them requires the ordinary least squares method.
+
+1. Given the valid instrument $Z_i$ (or set of valid instruments $Z$, but here we present an example with simple regression), we simply regress explanatory variable $x_i$ on $z_i$ in order to get the equation of the form $\hat{x_i} = \hat{\theta_1}+\hat{\theta_2}z_i$ and predicted values $\hat{x_i}$ of $x_i$. The estimator $\hat{\theta_2}$ has the standard form $\hat{\theta_2}=\frac{\widehat{cov}(x,z)}{\widehat{var}(z)}$.
+
+2. Perform the regression of the original model but use the predicted values $\hat{x_i}$ obtained in the first stage of the procedure instead of the original $x_i$, which yields the estimated regression equation $\hat{y_i} = \hat{\beta_1}+\hat{\beta_2}\hat{x_i}$. Then, the IV estimator $\hat{\beta}_{IV}$ is given by $\hat{\beta}_2^{2SLS}=\frac{\widehat{cov}(\hat{x},y)}{\widehat{var}(\hat{x})} = \frac{\widehat{cov}(x,z)}{\widehat{cov}(y,z)}$.
+
+The explanation of 2SLS as well as the representation in the matrix form and more details can be found in Greene (2012, Chapter 8).
+#> 
+
+Now that we have the background theoretical information, we can think of how the 2SLS works in our case. In such ”two-stage” regression we follow the causal chain by breaking down the chain into its links:
+
+- In the first stage, we will regress the settler mortality on the risk of expropriation (analogous to what we did at the end of the previous exercise).
+- In the second stage, we then use the fitted risk of expropriation (as predicted in the first stage by settler mortality) and regress the log GDP per capita on this fitted risk of expropriation. 
+
+Intuitively, you can think of the first stage as ”extracting” the exogenous part of institutions that we know is driven by settler mortality. Since the settler mortality is assumed to have no direct effect on current GDP, we can then - in the second stage - use the variation in institutions driven by settler mortality to explain current levels of GDP. Provided the instrument is valid (relevance and exogeneity met), we then arrive at a causal interpretation of the regression.
+
+### First stage in 2SLS
+
+Now let us begin with the first stage of the two-stage procedure in the most simple setup, and run the first regression. Although we have already performed these regressions in the previous exercise while assessing the relevance of the instrument, it is also useful to do the first stage explicitly and to have the results in front of us once again. Just press *check*:
+
+```{r "Task 4.3.2", results = "asis"}
+#< task
+data_base = readRDS("data_base.RDS")
+reg_3_1_1s = lm(exprop ~ log_mort + latit, data = data_base)
+stargazer(reg_3_1_1s, type = "html")
+#>
+```
+
+We have already shown that the instrument is highly significant since its p-value is smaller than $0.01$.
+
+`log_mort`'s coefficient estimate is $-0.510$ when regressing the expropriation risk. This implies that an increase in the settler mortality rate by one percent is associated with a decline in the quality of institutions score, measured with `exprop`, by $0.005$ units. This direction of the relationship is also in line with the general logic, as was discussed earlier.
+
+### Second stage in 2SLS
+
+As concerns the second stage, we will first perform it explicitly to demonstrate the logic of the approach.
+
+```{r "Task 4.3.3"}
+#< task
+#We use `fitted.values()` function to get the predicted by the model values of `exprop`
+exprop.hat = fitted.values(reg_3_1_1s)
+#>
+```
+
+Now let us estimate the second stage regression and compare the result with the simple OLS.
+
+Before we do so, try to guess whether the 2SLS estimated coefficient would be higher or lower than that in the OLS.
+
+#< quiz "Educated guess"
+question: Looking at the coefficient in front of the “exprop” variable, would the IV estimator be higher than the OLS estimator?
+sc:
+    - The OLS estimator should be biased upwards due to the reverse causality, omitted variables and institutions measured ex-post
+    - The OLS estimator should be biased downwards due to the measurement error
+    - The OLS estimator could be biased upwards or downwards, depending on which effect is stronger*
+success: Correct! In this situation we have reasons to assume both downward and upward bias, and it is difficult to determine the outcome at this point. 
+failure: Try again.
+
+#>
+
+Now let us check what we get with the regressions:
+
+```{r "Task 4.3.4", results = "asis"}
+#< task
+#Now we use these predicted values instead of the original `exprop` data to perform the second stage regression:
+reg_3_1_2s = lm(log_gdp_95 ~ exprop.hat + latit, data = data_base)
+
+#Here we also replicate the original OLS
+reg_3_1_OLS = lm(log_gdp_95 ~ exprop + latit, data = data_base)
+
+#Showing the results next to each other:
+stargazer(reg_3_1_OLS, reg_3_1_2s, type = "html")
+#>
+```
+
+The second stage shows the final regression, where we regress the logarithm of GDP on the expropriation risk (as predicted by the settler mortality). The corresponding 2SLS estimate of the impact of institutions on 1995 income per capita is $0.996$, which seems highly significant with a standard error of $0.222$.
+
+However, this result is not entirely correct. Manual computation leads to invalid standard errors and test statistics, so we cannot make any conclusions about the statistical significance.
+
+#< info "Why are standard errors wrong in this case?"
+
+In the case of using 2SLS, the variances of the estimates of the coefficients will differ from the case of the usual OLS. This happens since the residuals in the second stage include the error term of the first stage, but the standard errors should only involve the variance of the residual of our original model.
+
+*Source: Wooldridge (2018), ch. 15*
+
+#> 
+
+In order for the econometric package to calculate the standard errors of the coefficients correctly, you should always use the built-in 2SLS procedure. In our case, we will use function `ivreg()` from the package `ivreg`.
+
+#< info "How to use the ivreg() function?"
+
+The ivreg package provides a comprehensive implementation of the instrumental variables regression using the 2SLS estimation.
+
+Regressors and instruments for `ivreg()` function are most easily specified in a formula with two parts on the right-hand side, for example, $$ivreg(y \sim  x_1 + x_2\ |\ x_1 + z_1 + z_2,\ data = ...)$$, where $x_1$ and $x_2$ are, respectively, exogenous and endogenous explanatory variables, and $x_1$, $z_1$, and $z_2$ are instrumental variables. Both components on the right-hand side of the model formula include an implied intercept, unless, as in a linear model estimated by `lm()`, the intercept is explicitly excluded. Exogenous explanatory variables, such as $x_1$ in the example, must be included among the instruments. 
+
+#> 
+
+Now let us check what we get if we use the correct approach:
+
+```{r "Task 4.3.5", results="asis"}
+#< fill_in
+#As usual, loading the library first:
+library(ivreg)
+
+#Now replace first ___ in the ivreg() command with the proper instrumental variable and second ___ with an exogenous variable that we should also always add after |. Refer to the info block about ivreg() command above, if necessary.
+reg_3_1_2SLS = ivreg(log_gdp_95 ~ exprop + latit | ___ + ___, data = data_base)
+
+#Showing the output to compare all 3 
+stargazer(reg_3_1_OLS, reg_3_1_2s, reg_3_1_2SLS, type = "html")
+#>
+
+library(ivreg)
+reg_3_1_2SLS = ivreg(log_gdp_95 ~ exprop + latit | log_mort + latit, data = data_base)
+stargazer(reg_3_1_OLS, reg_3_1_2s, reg_3_1_2SLS, type = "html")
+```
+
+We can see that `ivreg()` function yields exactly the same coefficient estimates, but different standard errors, which are now correct.
+
+Before analyzing the bias and continuing with the 2 other statements, we will graphically show the change in coefficients and associated standard errors using the `modelplot()` function from `modelsummary` which plots the coefficient estimates along with their 95% confidence intervals.
+Just press *check*:
+```{r "Task 4.3.6"}
+#< task
+library(modelsummary)
+model_plot = modelplot(list("2SLS" = reg_3_1_2SLS, "OLS"= reg_3_1_OLS))
+model_plot
+#>
+```
+
+Analyzing the table and the chart allows us to make 3 statements:
+
+- An increase in the average risk of expropriation score by 1 unit now increases the GDP per capita by $(e^{0.996}-1) \cdot 100\%=170.7\%$.
+
+- Similar to the OLS result, we find a strong positive relationship, but now the estimated coefficient is even larger than the OLS estimate. This suggests that the measurement error in the institutions variables that creates the attenuation bias is likely to be more important than reverse causality and omitted variables biases. “Measurement error” here is broadly construed. As discussed earlier, in reality the set of institutions that matter for economic performance is very complex, and any single measure is bound to capture only part of the “true institutions”, creating a typical measurement error problem.
+
+- The latitude variable in 2SLS has the “wrong” sign and is insignificant. Based on this, the authors of the article suggest that many previous studies may have found latitude to be a significant determinant of economic performance because it is correlated with institutions (or with the exogenous component of institutions caused by early colonial experience). Nevertheless, we will continue to include latitude in our regressions to check if this assumption holds under other specifications.
+
+### Tests
+
+We would also like to have some formal confirmation that the instruments are indeed valid, that we actually face endogeneity problems in the OLS model, which will make us prefer 2SLS over OLS.
+
+Three main tests commonly used are the Weak instruments test, Hausman test and Sargan test.
+
+**Weak instruments test**
+
+Weak Instruments are instrumental variables that are only slightly correlated with the relevant endogenous explanatory variable or variables.
+
+If the instruments are weak, then:
+- the accuracy of 2SLS estimates is very low;
+- the results of significance tests may be incorrect, since the distribution of the coefficient estimate is not normal even asymptotically.
+
+In practice, we can simply check the calculated value of the F statistic in the first-stage regression, and if it is higher than $10$, then the instruments are considered relevant.
+
+The proof of this fact is technically quite complicated, and details can be found in the Stock, Yogo (2005).
+
+In our case the F-statistic was equal to $12.8$, therefore the instruments should be considered relevant.
+
+**Hausman test**
+
+One very helpful method to check endogeneity and to justify the use of 2SLS is to perform the Hausman test. It helps to decide whether we need to use 2SLS in our model, or we can limit ourselves to the usual OLS.
+
+#< info "Hausman test"
+
+The idea of the test is as follows: OLS estimates will be consistent only if the regressors are exogenous, and 2SLS estimates will be consistent regardless of whether the regressor is endogenous or exogenous. Therefore:
+- if the OLS and 2SLS estimates of the parameters do not differ too much, OLS is also applicable; 
+- if the OLS and 2SLS estimators are not similar to each other, then the OLS gives inconsistent results and should not be used. 
+
+The calculated value of the *test statistics* is based on a comparison of the vectors of estimates obtained using the OLS and 2SLS methods. Representation of the test statistic formula requires the use of matrix notation:
+
+$$(\hat{\beta}_2^{2SLS} - \hat{\beta}_2^{OLS})^T(\hat{V}(\hat{\beta}_2^{2SLS})-\hat{V}(\hat{\beta}_2^{OLS}))^{-1}(\hat{\beta}_2^{2SLS} - \hat{\beta}_2^{OLS})$$
+
+The null hypothesis of the Hausman test is that the OLS estimates of the model's coefficients are consistent. If it is correct, then the specified test statistic has a distribution $\chi^2(k)$, where $k$ is the total number of variables in the second step regression.
+
+- If the null hypothesis is not rejected, the usual OLS should be used to estimate the coefficients, since it will give consistent results (and, moreover, more accurate than 2SLS).
+- If the null hypothesis is rejected, one will have to conclude that the OLS estimates are inconsistent, and opt for 2SLS.
+
+The Hausman test has a limitation: its application is correct only when the instruments used are valid. If the conclusion that OLS is better obtained based on the use of the Hausman test with a dubious set of instrumental variables, then the conclusion itself will remain controversial. In other words, in order to perform the Hausman test correctly, you still have to look for a set of suitable instruments.
+
+*Source: Greene (2020)*
+#> 
+
+We can easily see the result of the Hausman test in the "Diagnostic test" section if we call `summary()` command with an option `diagnostics = TRUE`.
+
+```{r "Task 4.3.7"}
+#< task
+summary(reg_3_1_2SLS, diagnostics = TRUE)
+#>
+```
+
+#< quiz "Hausman test"
+question: Based on the results of the Hausman test, what conclusion can we make in both cases?
+sc:
+    - There is no clear evidence that OLS performs worse than 2SLS
+    - Although we might face endogeneity, we cannot say that 2SLS should be the preferred method, and further investigation is needed
+    - We face clear endogeneity problems, and 2SLS is the viable method that should be used here*
+success: Correct! The p-value of the Hausman test indicates the probability that our predictor `exprop` is correlated with the residuals. Since p-value is far below the significance level of 0.01, we reject the null hypothesis that there is no endogeneity, i.e. the regressor is endogenous and IV is needed.
+failure: Try again.
+
+#>
+
+
+**Sargan test**
+
+Sargan test for overidentification checks the exogeneity of instruments. The null hypothesis of the test is that all instruments are exogenous, an alternative hypothesis is that at least one of the instruments is endogenous.
+
+The test is available only if the number of instruments exceeds the number of endogenous regressors.
+
+In the constructed model, it is impossible to carry out the Sargan test for overidentification, since in this case, the number of instruments does not exceed the number of endogenous regressors (one endogenous regressor and one instrument). This means that the validity of the instrumental variables used can only be confirmed logically. Therefore, a meaningful understanding of the model is especially important if you are using 2SLS.
+
+We will not go deep into the Sargan test here since we will get back to overidentification tests in the next exercise.
+
+### Robustness checks with changing samples and concluding remarks
+Finally, it would make sense to check if our regression results are driven by some specific regions in the sample. In order to do this, we could run several regressions and exclude potentially suspicious (in terms of impact on the result) areas one by one. Additionally, we run a regression with region dummy variables to see if there are any potential discrepancies.
+
+#< info "Other additional controls and robustness checks"
+
+The validity of 2SLS results depends on the assumption that settler mortality in the past has no direct effect on current economic performance. Although this presumption appears reasonable to the authors, they substantiate it further by directly controlling for many of the variables that could plausibly be correlated with both settler mortality and economic outcomes and checking whether the addition of these variables affects the estimates. Authors account for the following variables:
+
+- colonial origin (identity of the main colonizing country)
+- legal origin
+- religion
+- climate and other geographic characteristic
+- set of temperature and humidity variables
+- fraction of the population of European descent
+- measures of natural resources, soil quality (in practice soil types), and for whether the country is landlocked
+- ethnolinguistic fragmentation
+
+Overall, the authors find that the results change remarkably little with the inclusion of these variables, and many variables become insignificant once the effect of institutions is controlled for.
+
+We will not run all of these regressions here as it would take a huge amount of space and require spending much more time. 
+However, please note that the authors’ results were replicated and confirmed.
+
+#> 
+
+Just press *check* to run the regressions and display the results:
+```{r "Task 4.3.8", results="asis"}
+#< task
+reg_3_2_2SLS = ivreg(log_gdp_95 ~ exprop + latit | log_mort + latit, data = subset(data_base, neo_europe == "0"))
+reg_3_3_2SLS = ivreg(log_gdp_95 ~ exprop + latit | log_mort + latit, data = subset(data_base, africa == "0"))
+reg_3_4_2SLS = ivreg(log_gdp_95 ~ exprop + asia + africa + other + latit | log_mort + asia + africa + other + latit, data = data_base)
+
+stargazer(reg_3_1_2SLS, reg_3_2_2SLS, reg_3_3_2SLS, reg_3_4_2SLS, type="html")
+#>
+```
+
+Column $(1)$ corresponds to the original 2SLS regression, which we have already discussed earlier.
+Column $(2)$ documents that our results are not driven by the Neo-Europes (authors include United States, Canada, Australia, and New Zealand in this group). When we exclude these countries, the estimates remain highly significant, and even increase a little. For example, the coefficient for institutions is now $1.21$ (s.e. = $0.35$).
+Column $(3)$ shows that our results are also robust to dropping all the African countries from the sample. The estimates without Africa are somewhat smaller, but also more precise. For example, the coefficient for institutions is $0.58$ (s.e. = $0.1$). 
+
+#< quiz "Africa"
+question: Why could the coefficient in front of `exprop` go down in a sample without Africa?
+sc:
+    - Due to the considerably smaller number of countries included in the regression
+    - Due to the lower variation in GDP and expropriation risk in all other countries*
+    - Due to the higher variation in GDP and expropriation risk in all other countries
+    - Cannot be estimated based on the available information
+success: Correct! It might have happened because of the clustered data, as African countries have low GDP and low quality of institutions while other countries have higher "starting point" in both variables. Significantly higher constant of 4.562 also supports this idea.
+failure: Try again.
+
+#>
+
+#< info "What if the sample is only limited to Africa?"
+
+Authors have also performed regression by limiting the sample to African countries only. They highlight that the first-stage relationship using the protection against expropriation variable becomes considerably weaker, and the 2SLS effect of institutions is no longer significant. Nevertheless, they state that the 2SLS effect of institutions remains to be significant with some (but not all) measures of institutions. This observation leads to the conclusion that the relationship between settler mortality and institutions is weaker within Africa. Such a conclusion is in line with common sense, since there is not enough variation in the quality of institutions in Africa, whereas the mortality could be much more volatile. Additionally, measurement errors can have a significant impact, which altogether leads to the failure of the regression to capture the relationship.
+
+#> 
+
+Column $(4)$ comprises the regression with continent dummies for Africa, Asia, and other, with America being the omitted group. The addition of these dummies does not change the estimated effect of institutions, and the dummies are jointly insignificant at the 5-percent level, though the dummy for Asia is significantly different from that of America. The fact that the African dummy is insignificant suggests that the reason why African countries are poorer is not due to cultural or geographic factors, but mostly accounted for by the existence of worse institutions in Africa.
+
+**Overall, these results show a large effect of institutions on economic performance, which was the main aim of the authors of the paper.**
+
+#< award "Paper successfully replicated"
+
+Congratulations! We have just successfully replicated a major part of the paper and come to the same results as the authors did more than 20 years ago. An accurate approach and attention to detail helped us to dive deeper into the topic and get a better understanding of the logic of the paper. But it’s not over yet!
+
+#>
+
+## Exercise 4.4: Effects of diseases, overidentification tests & criticism
+
+### Effects of diseases and health characteristics
+
+We have already discussed the potential effects of diseases in the section about the exogeneity of the instrument, but here we are going to delve deeper and analyze various regression specifications to investigate whether the instrument could be capturing the general effect of disease environment and other health characteristics of the countries on development.
+
+**Malaria, life expectancy and infant mortality** 
+
+Many authors have argued for the importance of malaria and other diseases in explaining African poverty (Bloom and Sachs, 1998; Gallup and Sachs, 1998; Gallup et al., 1998). Since malaria was one of the main causes of settler mortality, our estimate may be capturing the direct effect of malaria on economic performance.
+
+However, the authors of the paper are skeptical of this argument since malaria prevalence is highly endogenous; it is the poorer countries with worse institutions that have been unable to eradicate malaria. While Sachs and coauthors (1998) argue that malaria reduces output through poor health, high mortality, and absenteeism, most people who live in high malaria areas have developed some immunity to the disease. For a person without immunity, malaria is often fatal, so Europeans in Africa, India, or the Caribbean faced very high death rates. In contrast, death rates for the adult local population were much lower (Curtin (1964)).
+
+Malaria should therefore have very high social costs, but little direct effect on economic performance. In contrast, for Europeans, or anyone else who has not been exposed to malaria as a young child, malaria is usually fatal, making malaria prevalence a key determinant of European settlements and institutional development.
+
+As concerns health characteristics, authors use life expectancy and infant mortality.
+
+Let us check what impact would controlling for malaria, life expectancy and infant mortality have: 
+
+```{r "Task 4.4.1", results="asis"}
+#< task
+#Loading data
+data_base = readRDS("data_base.RDS")
+
+#Running regressions
+reg_base_2SLS = ivreg(log_gdp_95 ~ exprop + latit | log_mort + latit, data = data_base)
+reg_mal_2SLS = ivreg(log_gdp_95 ~ exprop + mal_94 + latit | log_mort + mal_94 + latit, data = data_base)
+reg_lifeexp_2SLS = ivreg(log_gdp_95 ~ exprop + life_exp_95 + latit | log_mort + life_exp_95 + latit, data = data_base)
+reg_infmort_2SLS = ivreg(log_gdp_95 ~ exprop + inf_mort_95 + latit | log_mort + inf_mort_95 + latit, data = data_base)
+
+#Showing results
+stargazer(reg_base_2SLS, reg_mal_2SLS, reg_lifeexp_2SLS, reg_infmort_2SLS, type = "html")
+#>
+```
+
+The estimates show a significant effect of institutions on income, which is similar to, but smaller than baseline estimates.
+
+Since malaria prevalence in 1994 is highly endogenous, controlling for it directly should underestimate the effect of institutions on performance (see Appendix A in the original paper). The coefficient on protection against expropriation is now estimated to be somewhat smaller, 0.72 instead of 0.996 in the original 2SLS regression.
+
+Authors claim that infant mortality is marginally significant. In our estimates, it is not significant at the $10\%$ level but is close to it, which might be due to marginal reporting differences. Anyway, this is not sufficient to make any conclusions about the impact of infant mortality.
+
+Since health is highly endogenous, the coefficient on these variables is biased up, while the coefficient of institutions is biased down. These estimates are therefore consistent with institutions being the major determinant of income per capita differences, with little or no effect from health variables, as stated in Acemoglu et al. (2001).
+
+Overall, the effect of institutions remains statistically significant, while malaria and other control variables are insignificant.
+
+*Authors also adopt an alternative approach by treating both health and institutions are treated as endogenous and are instrumented for using latitude, average temperature, and amount of territory within 100 km of the coast in addition to the original instrument, settler mortality. The results are very similar.*
+
+**Yellow fever**
+
+Although yellow fever’s epidemiology is quite different from malaria, it was also much more fatal to Europeans than to non-Europeans who grew up in areas where yellow fever commonly occurred. The yellow fever leaves its surviving victims with a lifelong immunity, which also explains its epidemic pattern, relying on a concentrated non-immune population.
+
+As a final strategy to see whether settler mortality could be proxying for the current disease environment, authors estimated models using a yellow fever instrument (dummy variable indicating whether the area was ever affected by yellow fever).
+
+Here we also show the first-stage regression to make the interpretation more clear:
+```{r "Task 4.4.2", results="asis"}
+#< task
+reg_yellfev_1s = lm(exprop ~ yell_fev, data = data_base)
+reg_yellfev_2SLS = ivreg(log_gdp_95 ~ exprop | yell_fev, data = data_base)
+stargazer(reg_yellfev_1s, reg_yellfev_2SLS, reg_base_2SLS,  type = "html")
+#>
+```
+
+The authors assess the yellow fever results as encouraging, as the estimate in the base sample is 0.91 comparable to the baseline estimate of $0.996$. In the first stage regression we see a negative $-1.083$ estimate for the coefficient in front of yellow fever, which implies that countries affected by yellow fever have lower protection against expropriation risk.
+
+Authors argue that it is an attractive alternative strategy since yellow fever is mostly eradicated today, which means that the dummy should not be correlated with the current disease environment. 
+
+However, the disadvantage of this approach is that there is less variation in this instrument than in the settler mortality variable. Controlling for latitude makes the IV estimates insignificant, which is likely due to this lack of variation as well as it being strongly correlated with latitude. Moreover, F-statistic in the first stage regression is $7.169$, which makes it a weak instrument.
+
+Overall, it is only partially suitable even for validation purposes.
+
+### Overidentification  tests
+
+Overidentification tests could be also used to investigate the validity of the approach. Here we would like to check whether `European settlements` or `Early institutions` (which we have faced in the "Choice of plausible instrument" section) have a direct effect on income per capita by using additional instruments.
+
+First of all, we replicate an easy-to-interpret version of the overidentification test. It adds the log of mortality as an exogenous regressor, and if mortality rates faced by settlers had a direct effect on income per capita, we would expect this variable to come in negative and significant.
+
+Just press *check*:
+```{r "Task 4.4.3", results="asis"}
+#< task
+#Run IV regressions with logarithm of mortality as exogenous variables in addition to expropriation risk treated as endogenous:
+
+reg_eur_mort_2SLS = ivreg(log_gdp_95 ~ exprop + log_mort + latit | eur_1900 + log_mort + latit, data = data_base)
+reg_cons_mort_2SLS = ivreg(log_gdp_95 ~ exprop + log_mort + latit | cons_1900 + log_mort + latit, data = data_base)
+reg_democ_mort_2SLS = ivreg(log_gdp_95 ~ exprop + log_mort + latit | democ_1900 + log_mort + latit, data = data_base)
+
+#Check results:
+stargazer(reg_eur_mort_2SLS, reg_cons_mort_2SLS, reg_democ_mort_2SLS, type = "html")
+#>
+```
+
+As you can see, `log_mort` is negative, but at the same time small and statistically insignificant in all cases. This gives a reason to assert that the impact of mortality rates faced by settlers likely works through their effect on institutions, but not through other channels.
+
+Now let's perform a **Sargan test**, which we were not able to in one of the previous exercises since we had not enough instruments (remember that it can only be applied if we have at least one more excluded instrument than endogenous variables). We are not going to cover mathematical explanation or detailed testing procedure, but more information could be found in e.g. Wooldridge (2018), ch. 15.
+
+We need to remember that the null hypothesis H0 is that all instruments are exogenous, and if the p-value is low (i.e. the H0 is rejected), it suggests that at least one instrument is endogenous.
+
+However, the most tricky part is that the Sargan test may well fail to detect if all instruments are endogenous and correlated with each other. Keeping this in mind, let us check the results.
+
+*Since showing summary for each regression takes a lot of space, we only show the results of one Sargan test. Other results can also be shown if you uncomment respective rows.*
+```{r "Task 4.4.4"}
+#< task
+#Run regressions with additional instruments
+reg_cons_2SLS = ivreg(log_gdp_95 ~ exprop + latit | log_mort + cons_1900 + latit, data = data_base)
+#reg_democ_2SLS = ivreg(log_gdp_95 ~ exprop + latit | log_mort + democ_1900 + latit, data = data_base)
+#reg_eur_2SLS = ivreg(log_gdp_95 ~ exprop + latit | log_mort + eur_1900 + latit, data = data_base)
+
+#Check `diagnostics` section in the summaries:
+summary(reg_cons_2SLS, diagnostics = TRUE)
+#summary(reg_democ_2SLS, diagnostics = TRUE)
+#summary(reg_eur_2SLS, diagnostics = TRUE)
+#>
+```
+
+The results of the Sargan tests are quite ambiguous. P-values are rather high, so we do not reject the null hypothesis and the instruments could be considered exogenous. However, we know that they are correlated and we also expected variables reflecting "European settlements" and "Early institutions" to be endogenous. This might suggest that:
+- all instruments are actually exogenous, but this would mean that our initial expectations about other instruments are not realistic enough 
+- all instruments are endogenous and the Sargan test fails to capture it
+- the data quality is simply not good enough to make meaningful conclusions
+
+We will also extend the author’s analysis and perform an additional Sargan test with yellow fever as an additional instrument.
+
+```{r "Task 4.4.5"}
+#< task
+#Run regressions with yellow fever as an additional instrument
+reg_yf_2SLS = ivreg(log_gdp_95 ~ exprop + latit | log_mort + yell_fev + latit, data = data_base)
+#Show Sargan test result
+summary(reg_yf_2SLS, diagnostics = TRUE)
+#>
+```
+
+The results are very similar to what we have seen in the previous tests, and we could not get closer to one and the only conclusion we can be sure about. In any case, we are facing potential problems that require proper investigation, and we will not dive deeper into it now, as this is not the main goal of this Rtutor problem set.
+
+#< award "Not everything always goes smooth"
+
+Well, this is a good example of a situation when unexpected problems or questions without a definite answer might arise. Actually, it is rather rare when any research gives unambiguous and uncontested results. This brings us to the next section about criticism of the paper.
+
+#>
+
+
+### Criticism
+
+Along with the recognition of the Acemoglu et al. (2001) work, there are a number of papers and articles that criticize it.
+
+The most prominent criticisms come from Albouy (2004, 2006, 2012) who claims that the settler mortality rates used by Acemoglu et al. suffer from measurement error.
+
+Albouy criticizes the data due to the fact that only 28 of the 64 countries in their original sample have actual data; whereas the other 36 countries are assigned rates based on conjectures made by the authors on the similarity of health conditions such as the disease environment. Therefore, Albouy drops these observations and finds that the effect of settler mortality on expropriation risk is much smaller, making it a weak instrument to study the causal effect of institutions on growth. Moreover, Albouy proposes to introduce a coding for whether or not the mortality data are drawn from a military campaign.
+
+In reply, Acemoglu et al. (2005, 2006, 2012) claim that their estimates of the data are supported by historical records and are therefore reliable, whereas Albouy‘s data suffer from selection biases based on irrational conjectures. Acemoglu et al. also show that even minor corrections to the way in which he codes “campaign” dummy restores the robustness of original results, and limiting the effect of very high mortality rates largely restores the robustness of the results even without correcting the inconsistencies in Albouy’s coding.
+
+Glaeser et al. (2004) argue that instrumenting institutions by European settler mortality violates the exogeneity assumption on the basis that the colonizers brought with them skills and human capital that persisted over time. They claim that it is the persistence of these skills that is causing the variation in output per worker today, and not the institutions. They run a simple OLS regression of GDP per capita on executive constraints, as well as controlling for additional variables, to show that human capital has been the main determinant of growth since the colonial period, and not institutions.
+
+**Overall, there is no single clear answer on how accurate are the conclusions made by Acemoglu et. al (2001) in their paper, but neither there is in any other research. Nevertheless, this is not surprising since the topic itself is rather complicated and revealing the actual picture is almost impossible.**
+
+**Authors still treat institutions as a “black box” and highlight: “It is useful to point out that our findings do not imply that institutions today are predetermined by colonial policies and cannot be changed. We emphasize colonial experience as one of the many factors affecting institutions.”**
+
+#< award "81% completed"
+Congratulations! You are making progress and have just completed ~81% of the problem set. Continue with the next exercise to get one step closer to the end of the problem set.
+#>
+
+## Exercise 5.1: 20 years later - introduction
+
+As discussed in the first exercise, we would also like to check if the original conclusions hold when we use modern data. In this exercise, we will analyze modern data for expropriation risk and log GDP per capita that is included in our dataset and compare the results with the original conclusions of the paper, written 20 years ago.
+
+Before we start, we should load the dataset again, as usual:
+
+```{r "Task 5.1.1"}
+#< task
+data = readRDS("data.RDS")
+head(data)
+#>
+```
+
+
+### Variables details
+
+We have already included modern data in the dataset, and here we are interested in variables `exprop_21` and `log_gdp_19`:
+- `exprop_21` variable is taken from Credendo, European credit insurance group, which is active in all segments of trade credit and political risk insurance and provides a range of products that cover risks worldwide. Credendo holds a regularly updated database estimating country risk with a number of parameters, including expropriation risk. In this dataset values provided by Credendo are inverted for convenience of comparison with the original dataset used in the paper, and are in a range from 1 to 7, where a higher score means less risk. Data can be downloaded <a href="https://credendo.com/en/country-risk" target="_blank">here</a>.
+
+
+#< info "How risk of expropriation was estimated by Credendo?"
+
+The risk of expropriation encompasses all discriminatory measures taken by a host government that deprive the investor of its investment without any adequate compensation; for the purpose of analyzing the expropriation risk, events of the embargo, change of (legal) regime, and denial of justice are included. In order to assess the expropriation risk, Credendo does not only assess the risk attached to expropriation as such, but also the functioning of legal institutions in the host country and the probability of a negative change in attitude towards foreign investments.
+
+This variable evaluates the risk of “outright confiscation and forced nationalization” of property. Lower ratings “are given to countries where expropriation of private foreign investment is a likely event”, therefore we can treat it also as a protection against expropriation risk with higher values meaning better protection and lower risk.
+
+#>
+
+- `log_gdp_19` is a logarithm of Gross Domestic Product per capita in year 2019, Purchasing Power Parity Basis. Data is taken from World Bank, as it was also done in the original paper. World Bank PPP GDP can be found <a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.PP.CD" target="_blank">here</a>.
+
+#< info "Why are we using 2019 GDP and 2021 expropriation risk?"
+
+- We took 2019 GDP per capita for 2 reasons. First, 2020 figures are still not available for some countries. Second, even if we had them in place, we all know that in 2020 the whole world has suffered from the COVID-19 pandemic, which had severe adverse effects on the GDP of many countries. Since we want to see a more general picture, we leave the analysis of the COVID-19 impact on economic performance to other researchers and focus on 2019 figures.
+
+- Historical data from Credendo is not available. However, given the nature of this variable, it is reasonable to assume that it remained relatively stable over the last 2 years and the 2021 expropriation risk could be a viable substitute for 2019 expropriation risk.
+
+#>
+
+### Descriptive analysis of modern data
+
+**GDP per capita**
+
+Since now we will analyze data for 2019, we can also plot it to see how the distribution changed in 24 years. Note that we are plotting 4 charts, 2 of which are necessary to compare log GDP distribution and 2 for unadjusted GDP data in 1995 and 2019. We also fix x- and y- axes limits to be able to directly compare the charts and see the differences.
+
+Now just press *check*.
+
+```{r "Task 5.1.2",fig.height=7, fig.width=8}
+#< task
+library(ggplot2)
+library(gridExtra)
+theme_set(theme_classic())
+
+histogram_GDP_95 = ggplot(data, aes(x = log_gdp_95)) + geom_histogram(fill="orange", colour="black", binwidth = 0.5) + geom_vline(xintercept=mean(data$log_gdp_95, na.rm=TRUE), size = 1, colour = "red", linetype = "dashed") + labs(title="Log GDP Distribution in 1995", x="Log PPP GDP 1995", y = "Count") + theme(plot.title = element_text(hjust = 0.5)) + xlim(5, 12) + ylim(0,45)
+
+histogram_GDP_95_exp = ggplot(data, aes(x = exp(log_gdp_95))) + geom_histogram(fill="lightblue", colour="black", binwidth = 2000) + geom_vline(xintercept=mean(exp(data$log_gdp_95), na.rm=TRUE), size = 1, colour = "red", linetype = "dashed") + labs(title="GDP Distribution in 1995", x="PPP GDP 1995", y = "Count") + theme(plot.title = element_text(hjust = 0.5)) + xlim(0, 80000) + ylim(0,45)
+
+histogram_GDP_19 = ggplot(data, aes(x = log_gdp_19)) + geom_histogram(fill="orange", colour="black", binwidth=0.5) + geom_vline(xintercept=mean(data$log_gdp_19, na.rm=TRUE), size = 1, colour = "red", linetype = "dashed") + labs(title="Log GDP Distribution in 2019", x="Log PPP GDP 2019", y = "Count") + theme(plot.title = element_text(hjust = 0.5)) + xlim(5, 12) + ylim(0,45)
+
+histogram_GDP_19_exp = ggplot(data, aes(x = exp(log_gdp_19))) + geom_histogram(fill="lightblue", colour="black", binwidth=2000) + geom_vline(xintercept=mean(exp(data$log_gdp_19), na.rm=TRUE), size = 1, colour = "red", linetype = "dashed") + labs(title="GDP Distribution in 2019", x="PPP GDP 2019", y = "Count") + theme(plot.title = element_text(hjust = 0.5)) + xlim(0, 80000) + ylim(0,45)
+
+#Plot them in a 2x2 matrix to compare the changes directly:
+grid.arrange(histogram_GDP_95, histogram_GDP_95_exp, histogram_GDP_19, histogram_GDP_19_exp, ncol=2)
+#>
+```
+
+As you can see on the charts, the modern 2019 data is significantly skewed right compared to 1995, which is obviously due to organic development of the world and countries’ economies in the last 20 years and due to inflation, since current prices are used.
+
+More interestingly, the nature of the distribution has changed. We still see something similar to the lognormal distribution in 2019, however, there are much fewer “very poor” countries and the right tail is much longer. This reflects the decrease in inequality and the more even distribution of income across countries.
+
+Let us also check how things have changes for each continent. For convenience we will only have a quick look at the medians. 
+
+```{r "Task 5.1.3"}
+#< task
+#As usual, first we need the respective package to make use of its commands.
+library(dplyr)
+
+#New we want use group_by() and summarize() commands to group the data by continents:
+
+data[!is.na(data$log_gdp_95)&!is.na(data$log_gdp_19),] %>% 
+  group_by(continent) %>% 
+  summarise(Median_GDP_per_capita_95 = round(median(exp(log_gdp_95)), digits = 0), Median_GDP_per_capita_19 = round(median(exp(log_gdp_19)), digits = 0))
+
+#>
+```
+
+As you can see, the variation between countries on different continents in both 1995 and 2019 is quite significant. In 2019 we see a 2- to 5-fold increase in median GDP per capita with continents holding similar relative positions as in 1995. We also notice that Asia has experienced the highest growth over these years (as % change), which also matches our expectations since Asian countries have seen a surge in foreign investments and were, in general, developing faster than any other region over the last 20 years.
+
+**Protection against expropriation risk**
+
+Let us now compare the country’s ratings for protection against expropriation risk. We adopt a similar approach and compare the data with the help of histograms and same axes scales.
+
+```{r "Task 5.1.4"}
+#< task
+#Plot original expropriation risk (variable `exprop`) on the histogram
+histogram_exprop_95 = ggplot(data, aes(x = exprop)) + geom_histogram(fill="darkmagenta", colour="black", binwidth=0.5) + geom_vline(xintercept=mean(data$exprop, na.rm=TRUE), size = 1, colour = "red", linetype = "dashed") + labs(title="Protection against expropriation risk (old)",x="Protection against expropriation risk", y = "Count") + theme(plot.title = element_text(hjust = 0.5)) + xlim(0,12) + ylim(0,40)
+
+#Plot new measure of expropriation risk (variable `exprop_21`) on the histogram
+histogram_exprop_21 = ggplot(data, aes(x = exprop_21)) + geom_histogram(fill="darkmagenta", colour="black", binwidth=0.5) + geom_vline(xintercept=mean(data$exprop_21, na.rm=TRUE), size = 1, colour = "red", linetype = "dashed") + labs(title="Protection against expropriation risk (new)", x="Protection against expropriation risk", y = "Count") + theme(plot.title = element_text(hjust = 0.5)) + xlim(0,12) + ylim(0,40)
+
+#Now plot both histograms side by side
+grid.arrange(histogram_exprop_95, histogram_exprop_21, ncol=1)
+
+library(skimr)
+skim(data)
+#>
+```
+
+First thing that we see there is that the author’s data for 1995 is much more granular, therefore there are no empty breaks between columns and the distribution is more smooth.
+
+At the same time, we can clearly see that both sources assess the expropriation risk similarly in terms of distribution patterns. As discussed in the first exercise, there are 2 peaks at around average and maximum scores, reflecting groups of developing and developed countries, with a lower number of countries receiving extremely low or above-average ratings. This gives us hope that the expropriation risk was similarly estimated by Credendo as it was done in the original paper.
+
+Finally, we see that the scale is slightly different: it varies from 0 to 10 in the original variable and from 0 to 7 in the modern representation. This also results in different average values.
+
+#< quiz "Its a trap 5"
+question: Would it make sense to use these values for expropriation risk in the regressions and directly compare the estimators?
+sc:
+    - Yes, since the distribution patterns are similar and we have the same logical idea behind both the original and modern data.
+    - No, since we have different scales with different means and standard deviations.*
+success: Correct! If we use the unadjusted values, we cannot interpret the values of the OLS estimators in the same way. Change of expropriation risk by 1 would have different sense in the first and second charts. Therefore we should standardize the variables.
+failure: Try again.
+
+#>
+
+Alright, let us then standardize the variables:
+
+```{r "Task 5.1.5"}
+#< task
+#Standardization procedure:
+data$exprop_95_st = (data$exprop - mean(na.omit(data$exprop)))/(sqrt(var(na.omit(data$exprop))))
+data$exprop_21_st = (data$exprop_21 - mean(na.omit(data$exprop_21)))/(sqrt(var(na.omit(data$exprop_21))))
+
+#Check that everything is done properly:
+data %>%
+  summarise(Mean_95 = round(mean(na.omit(exprop_95_st)), digits = 0),
+            SD_95 = round(sqrt(var((na.omit(exprop_95_st)))), digits = 0),
+            Mean_21 = round(mean(na.omit(exprop_21_st)), digits = 0),
+            SD_21 = round(sqrt(var((na.omit(exprop_21_st)))), digits = 0))
+#>
+
+```
+
+With the standardized protection against expropriation risk, we can easily compare the regressions and interpret the differences as the coefficients would reflect the predicted change in GDP when the expropriation risk rating changes by 1, i.e. by the standard deviation.
+
+## Exercise 5.2: 20 years later - regressions
+
+### OLS regression
+
+First of all, we present a visual representation of the OLS regressions to check how close we are 20 years to the original paper in the most simple case.
+
+In the code chunk below we both replicate the chart from the paper and add a new one with modern data.
+
+```{r "Task 5.2.1"}
+#< task
+
+#Load a base sample with standardised variables
+data_base_st = readRDS("data_base_st.RDS")
+
+#Construct plots showing standardised expropriation risk and gdp values across the base sample
+
+plot_1 = data_base_st %>%
+    ggplot(aes(x = exprop_95_st, y = log_gdp_95)) +
+    geom_text(label=data_base_st$country) + 
+    labs(x="Protection against expropriation risk 1995", y = "Log PPP GDP 1995") +
+    geom_smooth(method='lm', se = FALSE) +
+    ylim(6,12) +
+    xlim(-2,2)
+
+
+plot_2 = data_base_st %>%
+    ggplot(aes(x = exprop_21_st, y = log_gdp_19)) +
+    geom_text(label=data_base_st$country) + 
+    labs(x="Protection against expropriation risk 2021", y = "Log PPP GDP 2019") +
+    geom_smooth(method='lm', se = FALSE) +
+    ylim(6,12) +
+    xlim(-2,2)
+
+  
+#Show them next to each other
+grid.arrange(plot_1, plot_2, ncol=2)
+
+#>
+
+
+```
+
+Comparing the charts, we see a very similar picture. The line on the right chart is shifted upwards, obviously reflecting a positive change of countries’ GDP per capita, which means that we should see a higher constant in the regression results.
+
+More importantly, the slope is quite similar, which implies that the original conclusions about the correlation of these variables are likely to hold at this point (remember that we cannot say anything about the causal relationship so far).
+
+Let us know compare the OLS regression results:
+
+```{r "Task 5.2.2", results="asis"}
+#< task
+#First we replicate the original OLS
+OLS_old = lm(log_gdp_95 ~ exprop_95_st + latit, data = data_base_st)
+
+#Now we build a new OLS using the modern data
+OLS_new = lm(log_gdp_19 ~ exprop_21_st + latit, data = data_base_st)
+
+#Showing the results next to each other:
+library(stargazer)
+stargazer(OLS_old, OLS_new, type = "html")
+#>
+```
+
+The OLS results are quite similar. As expected, we have a bigger constant and the coefficient of interest in front of “Protection against expropriation risk” has not changed much. Interestingly, latitude is not significant in the modern regression and R-squared is lower, which might be because of more precise and granular data used by the authors in the original paper.
+
+Since we know that OLS does not capture the causal relationship adequately, we move to the IV regression straight away.
+
+### IV regression
+
+We will use the same instrument, logarithm of settler mortality. 
+
+Recalling the conditions for it to be valid, it should be **relevant** and **exogenous**. 
+
+The same arguments as before apply to prove the exogeneity since we have only taken GDP data 20 years later and other fundamental conditions have not changed.
+
+As concerns relevance, we also apply the same approach as before to check the relation between modern expropriation risk data and mortality.
+
+For this we can plot these 2 variables and run the OLS regression:
+
+```{r "Task 5.2.3"}
+#< task
+#Here we build a plot with log mortality rate on x-axis and protection against expropriation risk on y-axis. We also add the regression line to the plot.
+exprop_mort_old = data_base_st %>%
+    ggplot(aes(x = log_mort, y = exprop_95_st)) +
+    geom_point() + 
+    labs(x="Log of settler mortality rate", y = "Protection against expropriation risk 1995") + geom_smooth(method='lm', se = FALSE)
+
+exprop_mort_new = data_base_st %>%
+    ggplot(aes(x = log_mort, y = exprop_21_st)) +
+    geom_point() + 
+    labs(x="Log of settler mortality rate", y = "Protection against expropriation risk 2021") + geom_smooth(method='lm', se = FALSE)
+
+
+#present both charts side by side
+grid.arrange(exprop_mort_old, exprop_mort_new, ncol = 2)
+
+#>
+```
+
+Here we see that the regression should be very similar - the slope is almost the same although the data is more fragmented and categorical. Let’s check it:
+
+```{r "Task 5.2.4", results="asis"}
+#< task
+#Here we run respective regressions.
+reg_exprop_mort_old = lm(exprop_95_st ~ log_mort + latit, data = data_base_st)
+reg_exprop_mort_new = lm(exprop_21_st ~ log_mort + latit, data = data_base_st)
+
+stargazer(reg_exprop_mort_old, reg_exprop_mort_new, type = "html")
+#>
+```
+
+Great news, using modern data has confirmed the relevance of the instrument and even showed higher R-squared and F-statistic. Moreover, the F-statistic is equal to 13.0, therefore the instrument passes the **weak instruments test** and could be actually considered relevant. This once again shows that ex-colonies where Europeans faced higher mortality rates have substantially worse institutions today.
+
+Now it’s time to run IV regressions and check whether the original results actually hold 20 years later.
+
+```{r "Task 5.2.5", results="asis"}
+#< task
+library(ivreg)
+reg_2SLS_old = ivreg(log_gdp_95 ~ exprop_95_st + latit | log_mort + latit, data = data_base_st)
+reg_2SLS_new = ivreg(log_gdp_19 ~ exprop_21_st + latit | log_mort + latit, data = data_base_st)
+
+stargazer(reg_2SLS_old, reg_2SLS_new, type = "html")
+#>
+```
+
+The results are rather surprising. Using standardized modern data gives an even higher estimate of the coefficient in front of the expropriation risk. Change in the standardized 1995 protection against expropriation risk (`exprop_95_st`) by 1 standard deviation (i.e. by 1 unit) would imply approx. 6-fold change in PPP GDP per capita whereas modern data suggests a 7-fold difference.
+
+As in the original IV regression, the latitude variable in 2SLS has the “wrong” sign and is insignificant. This once again supports the authors’ idea that latitude could be correlated with institutions or with the exogenous component of institutions caused by the early colonial experience.
+
+Moreover, R-squared is negative. However, we should not interpret it. This happens because of the IV methodology - when the endogenous variables are regressed on the exogenous variables and the predicted values are then used as covariates in the second stage, the error that is minimized in the second stage is not the same as the error used to calculate the residual sum of squares ($R^2 = 1 - \frac{Residual\ Sum\ of\ Squares}{Total\ Sum\ of\ Squares}$). Consequently, the residual sum of squares can be less than the total sum of squares, which implies that the R-squared has become meaningless.
+
+We will not run different regression specifications playing around with the sample and control variables here. However, the regressions were additionally built out of the scope of this problem set, and they showed that the coefficients are significant (at $1\%$ level except for the regression with continent dummy variables, where it is significant at $10\%$ level) and hold around $2$, as it is in the base case IV regression.
+
+```{r "Task 5.2.5", results="asis"}
+#< task
+
+#>
+```
+
+#< award "99% completed"
+Great job! You have completed all exercises with coding tasks. Let us move to the conclusion in the next section now for some final words. 
+#>
+
+## Exercise 6: Conclusion
+
+The aim of this interactive problem set was to find out whether the differences in GDP per capita between countries can be explained by historical differences in institutions and state policies, as better institutions, more secure property rights, and less distortionary policies lead to the more favorable economic environment and a greater level of income.
+
+Although the notion that the causal relationship between quality of institutions and economic performance finds support from many economists and social scientists, there are many varying opinions on what determines institutions and government attitudes towards economic progress. In order to estimate the effect of institutions on economic performance, one needs to isolate exogenous sources of variation, which is not an obvious task due to the uncertainty mentioned above.
+
+In this set of exercises, we have replicated the paper **The Colonial Origins of Comparative Development: An Empirical Investigation** by D. Acemoglu, S. Johnson, and Jamea A. Robinson (2001), where the authors argue that differences in colonial experience could be a valid source of exogenous differences in institutions.
+
+We started with descriptive statistics and graphical analysis in order to introduce the data provided for 163 countries, 64 of which were colonies in the past. We have learned how to use R functionality to build nice histograms and interactive charts as well as group data to find interesting patterns. We have found a considerable correlation between the quality of institutions (expropriation risk) and economic performance (PPP GDP per capita), as well as examined other bivariate relations between variables.
+
+Then we have looked at the OLS regression to confirm our ideas about these relations and understood that the model is subject to numerous endogeneity problems. With the help of the backward induction, we have followed the authors’ logic to get back in the past and find that settler mortality could be a source of exogenous variation in institutions. Using it as an instrument, we have built instrumental variables regressions to find a positive causal relationship between the quality of institutions and economic performance.
+
+Although we have also replicated some of the robustness checks and endogeneity tests, the quality of the data, authors’ argumentation about the exogeneity of instruments, and assumptions used at each step could be questioned, as it was done by Albouy (2004, 2006, 2012) or Glaeser et al. (2004).
+
+In the last exercises of the problem set, we have extended the original paper by including modern data and got very similar results. Our results confirm the original conclusions, however, the same questions to the validity of the approach also remain. Overall, it is hardly conceivable that an agreement on such a topic would be reached any time soon, partially due to the complexity of the world and numerous factors affecting institutions and economic performance of different countries, partially due to the extremely long time frame, and partially due to the imperfection of available data.
+
+Eventually, despite the presence of various opinions and points of view on this question, this paper represents a worthwhile attempt to get closer to the point when the “true” relation and causality will be revealed.
+
+#< award "100% completed"
+Congratulations! You have completed all mandatory exercises and successfully got to the end of the problem set. This took some time, but I hope you enjoyed the exercises and learned something new!
+#>
+
+Here you can display all awards that you collected in the course of this problem set. Just press *edit* and *check* afterwards.
+
+```{r "Awards"}
+#< task
+awards()
+#>
+```
+
+## Exercise 7 (optional): Data preparation
+
+This is an additional exercise.
+
+Many problem sets already offer pre-processed datasets, but the stage of data preparation is a very important part of any research which often requires substantial time and effort, especially if the data is not readily available.
+
+In this exercise, you can learn how to prepare the data for further analysis step by step. Our case is still simplified, however, it gives a glimpse of this process.
+
+First, we are going to import the necessary data in the raw form. As we are starting to replicate the paper from scratch, we will have to deal with the data packed for STATA format, i.e. *.dta* files. Nevertheless, R allows to load external packages with many useful features for data analysis and programming, and we will certainly take advantage of that. The necessary package is called `foreign`, which gives us a valuable command `read.dta()` to import *.dta* files into R. 
+
+In this task you should first use the command `library()` to access the package `foreign`. You simply have to put the name of the package in brackets of the command without any quotes. After that import a first piece of our data, which is named `Maketable1.dta`. Just use the command `read.dta()` with `Maketable1.dta` as an argument in quotes and assign it to the variable `table_1`.
+
+```{r "Task 8.1"}
+#< task
+# Load the package `foreign`. Type the code in the empty line below:
+
+#>
+library(foreign)
+
+#< task
+# Now assign the data maketable1.dta to the variable table_1. Enter your code below:
+
+#>
+table_1 = read.dta("maketable1.dta")
+#< hint
+display("In order to save the data for future use, you should create this object in R. You therefore write: table_1 = ... Then you have to give R the command what to save under this name - you add command read.dta(). In the brackets you write the data you want to load. It is also important to put quotes, otherwise R will think that you put another command in brackets. Then click check.")
+#>
+
+```
+
+Now let's have a look at what the authors provide in this table. Use the command `head()` with loaded table name as an argument to reveal first few rows of the dataset.
+
+```{r "Task 8.2",optional=TRUE}
+#< task
+#Let's have a look at the data with the head() command. Enter your code here:
+
+#>
+head(table_1)
+```
+
+Ok, that looks not very self-explaining at the first sight. But no worries, this is normal as we have just dived into something completely unknown (if you do this exercise before the start of the main part of the problem set). We cover every detail together step by step in the main part of the problem set.
+
+Now let's examine the first column. We see that it is named `shortnam`, whereas all observations in the column contain 3 letters - AFG, AGO, ARE and so on.
+
+#< quiz "Makes sense"
+question: What do 3 letters in the column `shortnam` mean?
+sc:
+    - Individual random code of every data point
+    - First letters of researchers' names that gathered the respective data points
+    - International country code*
+    - Chemical element symbol
+success: Well, this time the answer was quite obvious.
+failure: Try again.
+
+#>
+
+Great, now we are familiar with at least one column in our data. Other columns are not that obvious, but we will not guess their meaning like we did for the first column. Let’s better load another piece of our data, which is named `Maketable2.dta`. Store it under the name `table_2` and show the "head" once again. 
+
+```{r "Task 8.3"}
+#< task
+# Assign the data maketable2.dta to the variable table_2 and show the first rows. Enter your code here:
+
+#>
+table_2 = read.dta("maketable2.dta")
+head(table_2)
+```
+
+Now compare the tables.
+
+#< quiz "Blind comparison"
+question: Are there any similarities between the tables?
+sc:
+    - Same dimensions of the datasets
+    - Same order of first columns
+    - Some columns are similar*
+    - No
+success: Correct, you have noticed that both tables have the same columns like `shortnam` or `avexpr`.
+failure: Try again.
+
+#>
+
+Great, now we see that the data tables have something in common. One would agree that it could be difficult to get a complete picture of the data by looking at multiple tables at the same time, especially if there are many of them. 
+
+Let's then load all necessary tables first.
+You can just run the next chunk or press *check*:
+```{r "Task 8.4"}
+#< task
+table_4 = read.dta("maketable4.dta")
+table_5 = read.dta("maketable5.dta")
+table_6 = read.dta("maketable6.dta")
+table_7 = read.dta("maketable7.dta")
+#>
+
+```
+No worries, we intentionally missed table_3 now, we do not need it so far. 
+
+We have not shown all of them here to save some time, but you may always check them in the *data* tab. All loaded tables have many common columns, but also some unique ones. We can merge all these tables into one to eventually get an initial overview of the complete dataset. In order to do this, we will use the functions `Reduce()` and `merge`. `Reduce()` successively applies the specified function (first argument) to the vector or list of objects in the second argument. `merge()` identifies columns or rows that are common between the two different data frames and combines tables based on this intersection of data.
+
+#< info "Reduce()"
+`Reduce()` takes a function f of two arguments and a list or vector x which is to be ‘reduced’ using f. The function is first called on the first two components of x, then with the result of that as the first argument and the third component of x as the second argument, then again with the result of the second step as the first argument and the fourth component of x as the second argument, etc. The process is continued until all elements of x have been processed.
+
+Note that it should be written starting with a capital "R", otherwise you will get an error.
+#>
+
+```{r "Task 8.5"}
+#< fill_in
+# Replace the ___ and do not forget to delete the comment sign in the next row afterwards. Then show the first rows of the data with head().
+data_0 = ___(___, list(table_1, table_2, table_4, table_5, table_7))
+head(data_0)
+#>
+data_0 = Reduce(merge, list(table_1, table_2, table_4, table_5, table_7))
+head(data_0)
+#< hint
+display("You should use function merge() as a first argument of the function Reduce(). In this case you should not add any arguments to the function merge() or even add brackets, i.e. just write the word *merge* instead of a 2nd *___*.")
+#>
+
+```
+
+#< award "Pen Pineapple Apple Pen"
+Congratulations, you learned how to combine different datasets in one. This is a very useful tool that will surely help you in the future.
+#>
+
+Now we have quite a lot of variables, 31 to be precise, and seems like things only went from bad to worse, as variables’ meanings are still unclear. But no worries, we will be there in a second.
+
+Let’s quickly rename the variables to make them more self-explaining. I will take advantage of the fact that I have already read the paper and give the variables names that make a little bit more sense. Just run the next chunk.
+
+```{r "Task 8.6"}
+#< task_notest
+#We use function rename() to give new names to specified columns:
+data_1 = rename(data_0,
+    country = shortnam,
+    exprop = avexpr,
+    log_gdp_95 = logpgp95,
+    base = baseco,
+    log_mort = logem4,
+    latit = lat_abst,
+    log_work_output = loghjypl,
+    eur_1900 = euro1900,
+    cons_1st = cons1,
+    cons_1900 = cons00a,
+    cons_1990 = cons90,
+    democ_1900 = democ00a,
+    mort = extmort4,
+    neo_europe = rich4,
+    other_relig = no_cpm80,
+    ex_colony = excolony,
+    brit_col = f_brit,
+    french_col = f_french,
+    orig_french = sjlofr,
+    mal_94 = malfal94,
+    yell_fev = yellow,
+    life_exp_95 = leb95,
+    inf_mort_95 = imr95,
+    coast_area = lt100km)
+#Let's also use 0 instead of NAs for the variable "base" 
+data_1$base[is.na(data_1$base)] = 0
+#Show data
+head(data_1)
+#>
+```
+
+Now we can hopefully see some more sense in these variables. 
+
+Now it is time to make some intermediary adjustments to the data:
+ - We have mentioned that there are dummy variables for continents, but it is clearly not the most visual way to present data. For descriptive analysis we would like to have one column with names of continents for each country, and for this we will use external data with more details. Nevertheless in a regression analysis we will get back to original dummies. 
+ - Finally, it could be often quite convenient to reorder the columns so that the overall structure would be more logical. 
+
+Let's make such adjustments, just run the chunk below.
+
+```{r "Task 2.7"}
+#< task
+#Load 2 files with coninent names for each country and PPP GDP in 2019
+continents_data_raw = read.csv("continents.csv")
+gdp2019_data_raw = read.csv("gdp2019.csv")
+exprop21_data_raw = read.csv("Expropriation risk 2021.csv")
+
+
+#Select only 2 necessary columns and rename them
+continents_data = select(continents_data_raw, Three_Letter_Country_Code, Continent_Name) %>% rename(country = Three_Letter_Country_Code, continent = Continent_Name)
+gdp2019_data = select(gdp2019_data_raw, Country.Code, X2019) %>% rename(country = Country.Code, gdp_2019 = X2019)
+exprop21_data = select(exprop21_data_raw, Country, Expropriation.risk) %>% rename(country = Country, exprop_21 = Expropriation.risk)
+
+
+#Merge original data with continents data and delete duplicating rows. We have to do it manually since some countries are assigned 2 continents (e.g. Armenia is assigned Europe and Asia at the same time).
+data_merged_raw = merge(x = data_1, y = continents_data, by = "country", all.x = TRUE)
+data_raw = data_merged_raw[-c(5,9,56,82,130,153),]
+
+#Manually assign correct values to missing ones
+data_raw[data_raw$country=="ZAR", "continent"] = "Africa"
+data_raw[data_raw$country=="YUG", "continent"] = "Europe"
+data_raw[data_raw$country=="ROM", "continent"] = "Europe"
+
+#Add column with 2019 GDP data
+data_merged_wGDP = merge(x = data_raw, y = gdp2019_data, by = "country", all.x = TRUE)
+
+#Add logarithms of 2019 GDP for each country
+data_merged_wGDP$log_gdp_19 = log(data_merged_wGDP$gdp_2019)
+
+
+#Add column with 2021 expropriation risk data
+data_merged_final = merge(x = data_merged_wGDP, y = exprop21_data, by = "country", all.x = TRUE)
+
+
+#Subset necessary columns in a more convenient order
+data = data_merged_final[c("country", "base", "ex_colony", "log_gdp_95", "log_gdp_19", "exprop", "exprop_21", "mort", "log_mort", "latit","continent", "africa", "asia", "neo_europe", "other", "eur_1900", "cons_1st", "cons_1900", "cons_1990", "democ_1900", "mal_94", "yell_fev", "life_exp_95", "inf_mort_95", "meantemp")]
+
+#Now we can save this dataset in the .RDS format
+saveRDS(data, file = "data.RDS")
+
+#>
+```
+
+Now we have a polished version of the dataset that we can analyze, show descriptive statistics and summarize. At this point, we have started (or will only start, if you did this exercise beforehand) the first exercise.
+
+## Exercise 8: References
+
+### Bibliography
+
+- Acemoglu, D., (1995), Reward structures and the allocation of talent, European Economic Review, 39, issue 1, p. 17-33
+
+- Acemoglu, D., Verdier, T., (1998). Property Rights, Corruption and the Allocation of Talent: A General Equilibrium Approach. Economic Journal, 108, issue 450, p. 1381-1403
+
+- Acemoglu, D., Johnson, S., & Robinson, J. A. (2001). The Colonial Origins of Comparative Development: An Empirical Investigation. The American Economic Review, 91(5), 1369–1401
+
+- Acemoglu, D., Johnson, S., & Robinson, J. A. (2005). A response to Albouy’s A Reexamination Based on Improved Settler Mortality Data, MIT Department of Economics Working Paper.
+
+- Acemoglu, D., Johnson, S., & Robinson, J. A. (2006). Reply to the Revised (May 2006) Version of David Albouy’s The Colonial Origins of Comparative Development: An Investigation of the Settler Mortality Data. Unpublished, September, MIT and Harvard.
+
+- Acemoglu, D., Johnson, S., & Robinson, J. A. (2012). Hither Thou Shalt Come, But No Further: Reply to “The Colonial Origins of Comparative Development: An Empirical Comment”. April, MIT and Harvard Working Paper 16966.
+
+- Albouy, D. (2004). A Reexamination Based on Improved Settler Mortality Data, University of California — Berkeley, December
+
+- Albouy, D. (2012). The Colonial Origins of Comparative Development: An Empirical Investigation: Comment, American Economic Review, 102(6), 3059-76
+
+- Besley, T. (1995). Property Rights and Investment Incentives: Theory and Evidence from Ghana. Journal of Political Economy, October 1995, 103(5), pp. 903-37.
+
+- Curtin, P. D. (1964). The image of Africa. Madison, WI: University of Wisconsin Press
+
+- Curtin, P. D. (1968). Epidemiology and the Slave Trade. Political Science Quarterly, 83(2), 190–216
+
+- Curtin, P. D. (1989). Death by migration: Europe's encounter with the tropical world in the 19th Century. New York: Cambridge University Press
+
+- Curtin, P. D. (1989). Disease and empire: The health of European troops in the conquest of Africa. New York: Cambridge University Press
+
+- Denoon, D. (1983). Settler capitalism: The dynamics of dependent development in the Southern Hemisphere. Oxford [Oxfordshire: Clarendon Press.
+
+- Diamond, J. M. (1997). Guns, germs and steel: The fate of human societies. New York: W.W. Norton & Co.
+
+- Gallup, J. L., Sachs, J. D., & Mellinger, A. D. (1998). Geography and Economic Development. International Regional Science Review, 22(2), 179–232.
+
+- Glaeser, E. L., La Porta, R., Lopez-de-Silanes, F., & Shleifer, A. (2004). Do institutions cause growth?. Journal of economic Growth, 9(3), 271-303.
+
+- Greene W. H. (2020). Econometric Analysis: Global Edition, 8th Edition. Stern School of Business, New York University
+
+- Hall, R., Jones, C., (1999). Why Do Some Countries Produce So Much More Output per Worker than Others?", Quarterly Journal of Economics, February 1999, 114(1), pp. 83-116.
+
+- Johnson, S., McMillan, J., Woodruff, C. (1999). Property Rights and Finance. Unpublished working paper, Massachusetts Institute of Technology and University of California, San Diego
+
+- Jones, E. L. (1981). The European miracle: Environments, economies and geopolitics in the history of Europe and Asia. Cambridge: Cambridge University Press
+
+- Knack, S., Keefer, P. (1995). Institutions and Economic Performance: Cross-Country Tests Using Alternative Measures. Economics and Politics, 7(3), pp. 207-27
+
+- La Porta, R., Lopez-de-Silanes, F., Shleifer, A. and Vishny, R. W. (1999). The Quality of Government. Journal of Law, Economics, and Organization, 15(1), pp. 222-79
+
+- Mauro, P. (1995). Corruption and Growth. Quarterly Journal of Economics, 110 (3), pp. 681-712
+
+- Mazingo, C. (1999). Effects of Property Rights on Economic Activity: Lessons from the Stolypin Land Reform. Unpublished manuscript, Massachusetts Institute of Technology
+
+- McArthur, J. W., Sachs, J. D. (2001). Institutions and Geography: Comment on Acemoglu, Johnson and Robinson (2000). National Bureau of Economic Research (Cambridge, MA) Working Paper No. 8114
+
+- Montesquieu C. S. (1989). The spirit of the laws. New York: Cambridge University Press [1748]
+
+- North, D. C. (1981). Structure and change in economic history. New York: W.W. Norton & Co.
+
+- Oldstone, Michael B. A. (1998). Viruses, plagues, and history. New York: Oxford University Press
+
+- Rodrik, D. (1999). Where Did All the Growth Go?", Journal of Economic Growth, 4(4), pp. 385-412
+
+- Stock J, Yogo M. (2005). Testing for Weak Instruments in Linear IV Regression. In: Andrews DWK Identification and Inference for Econometric Models, New York: Cambridge University Press, pp. 80-108
+
+- Wooldridge, J.M. (2018) Introductory Econometrics: A Modern Approach. 7th Edition. Cengage
+
+### R packages
+
+- Arel-Bundock, V., Gassen, J. et al. (2022): modelsummary. Summary Tables and Plots for Statistical Models and Data: Beautiful, Customizable, and Publication-Ready. R package version 0.9.5. URL: https://cran.r-project.org/web/packages/modelsummary/modelsummary.pdf 
+
+- Auguie, B., Antonob, A. (2017): gridextra. Miscellaneous Functions for ``Grid'' Graphics. R package version 2.3. URL: https://cran.r-project.org/web/packages/gridExtra/gridExtra.pdf
+
+- Barrett, M. (2021): regtools. Analyze and Create Elegant Directed Acyclic Graphs. R package version 0.2.4. URL: https://cran.r-project.org/web/packages/ggdag/ggdag.pdf
+
+- Fox, J., Kleiber, C., Zeileis, A., Kuschnig, N. (2021): ivreg. Instrumental-Variables Regression by '2SLS', '2SM', or '2SMM', with Diagnostics. R package version 0.6-1. URL: https://cran.r-project.org/web/packages/ivreg/ivreg.pdf
+
+- Hlavac, M. (2018): stargazer. Well-Formatted Regression and Summary Statistics Tables. R package version 5.2.2. URL: https://cran.r-project.org/web/packages/stargazer/stargazer.pdf
+
+- Kranz, S. (2020). RTutor: Interactive R problem sets with automatic testing of solutions and automatic hints. R package version 2020.11.25. URL: https://github.com/skranz/RTutor
+
+- Matloff, N. (2019): regtools. Regression and Classification Tools. R package version 1.1.0. URL: https://cran.r-project.org/web/packages/regtools/regtools.pdf
+
+- Phillips, N. (2017): yarrr. A Companion to the e-Book ``YaRrr!: The Pirate's Guide to R''. R package version 0.1.5. URL: https://cran.r-project.org/web/packages/yarrr/yarrr.pdf
+
+- Sievert, C., Parmer, C., Hocking, T. et al. (2021): plotly. Create Interactive Web Graphics via 'plotly.js'. R package version 4.10.0. URL: https://cran.r-project.org/web/packages/yarrr/yarrr.pdf
+
+- R Core Team (2022): foreign. Read Data Stored by Minitab, S, SAS, SPSS, Stata, Systat, Weka, dBase,…. R package version 0.8-82. URL: https://cran.r-project.org/web/packages/foreign/foreign.pdf
+
+- Waring, E. et al. (2021): skimr. Compact and Flexible Summaries of Data. R package version 2.1.3. URL: https://cran.r-project.org/web/packages/skimr/skimr.pdf
+
+- Wickham, H., Chang, W. (2021): ggplot2. Create Elegant Data Visualisations Using the Grammar of Graphics. R package version 3.3.5. URL: https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf.
+
+- Wickham, H., Francois, R., Henry, L. and Müller, K. (2021): dplyr. A Grammar of Data Manipulation. R package version 1.0.7. URL: https://cran.r-project.org/web/packages/dplyr/dplyr.pdf.
+
+- Wickham, H., RStudio (2021): tidyverse. Easily Install and Load the 'Tidyverse'. R package version 1.3.1. URL: https://cran.r-project.org/web/packages/tidyverse/tidyverse.pdf
+
+
+### Data
+
+- Original data from the D. Acemoglu et al. (2001) paper: https://economics.mit.edu/faculty/acemoglu/data/ajr2001
+
+- Modern data for expropriation risk: https://credendo.com/en/country-risk
+
+- Modern PPP GDP per capita data: https://data.worldbank.org/indicator/NY.GDP.MKTP.PP.CD
